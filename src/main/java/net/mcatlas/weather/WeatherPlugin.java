@@ -119,4 +119,15 @@ public class WeatherPlugin extends JavaPlugin {
         return dynmapHandler;
     }
 
+    public TornadoHandler getTornadoHandler() {
+        return tornadoHandler;
+    }
+
+    public TropicalCycloneHandler getTropicalCycloneHandler() {
+        return tropicalCycloneHandler;
+    }
+
+    public WeatherStatusHandler getWeatherStatusHandler() {
+        return weatherStatusHandler;
+    }
 }

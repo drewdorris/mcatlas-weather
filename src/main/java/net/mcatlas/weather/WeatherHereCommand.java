@@ -21,7 +21,7 @@ public class WeatherHereCommand implements CommandExecutor {
 		if (!(sender instanceof Player)) return false;
 		Player player = (Player) sender;
 
-		WeatherPlayer weatherPlayer = WeatherPlugin.get().getWeatherPlayer(player.getUniqueId());
+		WeatherPlayer weatherPlayer = WeatherPlugin.get().getWeatherStatusHandler().getWeatherPlayer(player.getUniqueId());
 		if (weatherPlayer == null) {
 			player.sendMessage("Error");
 			return false;
@@ -29,10 +29,10 @@ public class WeatherHereCommand implements CommandExecutor {
 		WeatherData weatherData = weatherPlayer.getWeatherData();
 
 		player.sendMessage(ChatColor.YELLOW + "Description: " + ChatColor.WHITE +
-				weatherData.weatherDesc + "; " + weatherData.weatherFullDesc);
+				weatherData.getWeatherDesc() + "; " + weatherData.getWeatherFullDesc());
 
-		int fahrenheit = (int) WeatherUtil.kelvinToFahrenheit(weatherData.temperature);
-		int celsius = (int) WeatherUtil.kelvinToCelsius(weatherData.temperature);
+		int fahrenheit = (int) WeatherUtil.kelvinToFahrenheit(weatherData.getTemperature());
+		int celsius = (int) WeatherUtil.kelvinToCelsius(weatherData.getTemperature());
 		Color colorTemp = WeatherUtil.getColorFromTemperature(fahrenheit);
 		ChatColor chatColor = net.md_5.bungee.api.ChatColor.of(colorTemp);
 		player.sendMessage(ChatColor.YELLOW + "Temperature: " + chatColor +
@@ -40,23 +40,23 @@ public class WeatherHereCommand implements CommandExecutor {
 
 		Location playerLocation = player.getLocation();
 		playerLocation.setY(64);
-		Location weatherLocation = new Location(playerLocation.getWorld(), weatherData.x, 64, weatherData.z);
+		Location weatherLocation = new Location(playerLocation.getWorld(), weatherData.getX(), 64, weatherData.getZ());
 		int distance = (int) playerLocation.distance(weatherLocation);
 		player.sendMessage(ChatColor.YELLOW + "Coords: " + ChatColor.WHITE +
 				weatherLocation.getBlockX() + ", " + weatherLocation.getBlockZ() + " " +
 				ChatColor.GRAY + "(" + distance + " blocks away)");
 
-		player.sendMessage(ChatColor.YELLOW + "Pressure: " + ChatColor.WHITE + (int) weatherData.pressure + "mb");
-		player.sendMessage(ChatColor.YELLOW + "Humidity: " + ChatColor.WHITE + (int) weatherData.humidity + "%");
-		player.sendMessage(ChatColor.YELLOW + "Cloudiness: " + ChatColor.WHITE + (int) weatherData.cloudiness + "%");
-		player.sendMessage(ChatColor.YELLOW + "Visibility: " + ChatColor.WHITE + (int) weatherData.visibility + " meters");
+		player.sendMessage(ChatColor.YELLOW + "Pressure: " + ChatColor.WHITE + (int) weatherData.getPressure() + "mb");
+		player.sendMessage(ChatColor.YELLOW + "Humidity: " + ChatColor.WHITE + (int) weatherData.getHumidity() + "%");
+		player.sendMessage(ChatColor.YELLOW + "Cloudiness: " + ChatColor.WHITE + (int) weatherData.getCloudiness() + "%");
+		player.sendMessage(ChatColor.YELLOW + "Visibility: " + ChatColor.WHITE + (int) weatherData.getVisibility() + " meters");
 
-		String direction = WeatherUtil.degreesToCardinal(weatherData.windDirection);
+		String direction = WeatherUtil.degreesToCardinal(weatherData.getWindDirection());
 		player.sendMessage(ChatColor.YELLOW + "Wind: " + ChatColor.WHITE + direction + " at " +
-				(int) weatherData.windSpeed + "mph; " + (int) weatherData.windGust + "mph gust");
+				(int) weatherData.getWindSpeed() + "mph; " + (int) weatherData.getWindGust() + "mph gust");
 
-		if (weatherData.name != null && !weatherData.name.isEmpty()) {
-			player.sendMessage(ChatColor.YELLOW + "Location: " + ChatColor.WHITE + "\"" + weatherData.name + "\"");
+		if (weatherData.getName() != null && !weatherData.getName().isEmpty()) {
+			player.sendMessage(ChatColor.YELLOW + "Location: " + ChatColor.WHITE + "\"" + weatherData.getName() + "\"");
 		}
 
 		if (args.length > 0) {

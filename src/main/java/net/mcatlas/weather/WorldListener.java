@@ -40,8 +40,8 @@ public class WorldListener implements Listener {
 			// every 5(maybe) minutes updates tornado locations
 			// async
 			Bukkit.getScheduler().runTaskTimerAsynchronously(WeatherPlugin.get(), () -> {
-				WeatherPlugin.get().updateTornadoes();
-			}, 20 * 20L, 20 * 60 * WeatherPlugin.get().getMinutesBetweenTornadoAlerts());
+				WeatherPlugin.get().getTornadoHandler().updateTornadoes();
+			}, 20 * 20L, 20 * 60 * WeatherPlugin.get().getTornadoHandler().getMinutesBetweenTornadoAlerts());
 		}
 	}
 
@@ -51,7 +51,7 @@ public class WorldListener implements Listener {
 		if (world.getEnvironment() != World.Environment.NORMAL) {
 			return;
 		}
-		WeatherPlugin.get().addPlayerToQueue(event.getPlayer(), WeatherStatusHandler.WeatherPriority.JOIN);
+		WeatherPlugin.get().getWeatherStatusHandler().addPlayerToQueue(event.getPlayer(), WeatherStatusHandler.WeatherPriority.JOIN);
 	}
 
 	/*

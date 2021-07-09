@@ -52,6 +52,10 @@ public class TornadoHandler {
         }, 10 * 20L, 20L);
     }
 
+    public int getMinutesBetweenTornadoAlerts() {
+        return minutesBetweenTornadoAlerts;
+    }
+
     public void launchEntitiesInTornado() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.getWorld().getEnvironment() != World.Environment.NORMAL) {

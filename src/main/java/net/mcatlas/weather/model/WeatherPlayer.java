@@ -65,13 +65,7 @@ public class WeatherPlayer implements Comparable<WeatherPlayer> {
 
     @Override
     public int compareTo(WeatherPlayer o) {
-        if (score > o.getScore()) {
-            return 1;
-        } else if (score < o.getScore()) {
-            return -1;
-        } else {
-            return 0;
-        }
+        return Integer.compare(score, o.getScore());
     }
 
     @Override

@@ -1,6 +1,5 @@
 package net.mcatlas.weather.model;
 
-import net.mcatlas.weather.model.Coordinate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
@@ -15,7 +14,7 @@ public class Forecast {
         this.time = time;
         this.irlLocation = new Coordinate(lat, lon);
         Coordinate ingame = Coordinate.getMCFromLife(lat, lon);
-        this.location = new Location(Bukkit.getWorlds().get(0), ingame.x, 64, ingame.y);
+        this.location = new Location(Bukkit.getWorlds().get(0), ingame.getX(), 64, ingame.getY());
         this.windsMph = windSpeed;
     }
 

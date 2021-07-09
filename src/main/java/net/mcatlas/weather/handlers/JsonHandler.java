@@ -25,7 +25,7 @@ public class JsonHandler {
     }
 
     public JsonElement getJsonFromURL(String urlString) {
-        URL url = null;
+        URL url;
         HttpURLConnection connection = null;
 
         try {
@@ -72,10 +72,11 @@ public class JsonHandler {
 
     // THIS IS FOR TESTING ONLY
     // example input "plugins/mcatlas-environment/tropicalstorms.json"
+    /*
     public JsonElement getJsonFromLocal(String jsonLocation) {
         JsonElement json = null;
 
-        try (Reader reader = new InputStreamReader(new FileInputStream(jsonLocation), "UTF-8")) {
+        try (Reader reader = new InputStreamReader(new FileInputStream(jsonLocation), StandardCharsets.UTF_8)) {
             json = new JsonParser().parse(reader);
         } catch (Exception e) {
             // do something
@@ -86,6 +87,7 @@ public class JsonHandler {
 
         return json;
     }
+     */
 
     @Nullable
     public WeatherData extractWeatherData(JsonElement json, Location location) {
@@ -106,7 +108,7 @@ public class JsonHandler {
         String weatherFullDesc = "";
         try { // full desc sometimes not listed
             weatherFullDesc = weather.get("description").getAsString();
-        } catch (Exception e) { }
+        } catch (Exception ignored) { }
         weatherFullDesc = WordUtils.capitalizeFully(weatherFullDesc);
 
         JsonObject mainObject = rootobj.getAsJsonObject("main");
@@ -120,7 +122,7 @@ public class JsonHandler {
         double windGust = 0;
         try { // wind gust occasionally not listed
             windGust = windObject.get("gust").getAsDouble();
-        } catch (Exception e) { }
+        } catch (Exception ignored) { }
 
         JsonObject cloudObject = rootobj.getAsJsonObject("clouds");
         double cloudy = cloudObject.get("all").getAsDouble();
@@ -150,11 +152,11 @@ public class JsonHandler {
         JsonObject alerts = rootobj.getAsJsonObject("data");
         for (Map.Entry<String, JsonElement> entry : alerts.entrySet()) {
             JsonElement stormElement = entry.getValue();
-            JsonObject stormObj = stormElement.getAsJsonObject();
             if (stormElement == null || stormElement.isJsonNull()) {
                 plugin.getLogger().warning("Storm Null");
                 continue;
             }
+            JsonObject stormObj = stormElement.getAsJsonObject();
             boolean active = stormObj.get("active").getAsBoolean();
             if (!active) continue;
 

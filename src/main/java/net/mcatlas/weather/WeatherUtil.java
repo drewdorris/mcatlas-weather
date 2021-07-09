@@ -10,15 +10,7 @@ public class WeatherUtil {
 
     public static Random RANDOM = new Random();
 
-    public static final String MSG_HEY = ChatColor.RED + ""
-            + ChatColor.BOLD + "Hey! " + ChatColor.RESET;
-
     public static String[] directions = { "N", "NE", "E", "SE", "S", "SW", "W", "NW", "N" };
-
-    public static Block set(Block block, Material material) {
-        block.setType(material, false);
-        return block;
-    }
 
     public static double kelvinToFahrenheit(double kelvin) {
         double celsius = kelvinToCelsius(kelvin);

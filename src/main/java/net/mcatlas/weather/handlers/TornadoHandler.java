@@ -170,7 +170,7 @@ public class TornadoHandler {
 
     public void nameItemInHand(Player player, Tornado tornado) {
         ItemStack mainItem = player.getInventory().getItemInMainHand();
-        if (mainItem == null || mainItem.getType() == Material.AIR) {
+        if (mainItem.getType() == Material.AIR) {
             return;
         }
 
@@ -253,7 +253,7 @@ public class TornadoHandler {
         Bukkit.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD +
                 "Tornado Warning in effect for: " + ChatColor.RESET + "" + ChatColor.RED + locations);
 
-        dynmapHandler.createTornadoMarkers(tornadoes);
+        plugin.getDynmapHandler().createTornadoMarkers(tornadoes);
         // TODO get alerts and alert things, create polygons, find towns in alert zones etc
     }
 

@@ -71,8 +71,6 @@ public class Tornado {
     }
 
     public void spawn() {
-        World world = location.getWorld();
-
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -125,10 +123,8 @@ public class Tornado {
         orig.setY(64);
         Location newLoc = tornado.getLocation().clone();
         newLoc.setY(64);
-        if (orig.distance(newLoc) < 10) {
-            return true;
-        }
-        return false;
+
+        return orig.distance(newLoc) < 10;
     }
 
 }

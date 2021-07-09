@@ -21,7 +21,7 @@ public class TropicalCyclone {
         this.name = name;
         this.irlLocation = new Coordinate(lat, lon);
         Coordinate ingame = Coordinate.getMCFromLife(lat, lon);
-        this.location = new Location(Bukkit.getWorlds().get(0), ingame.x, 64, ingame.y);
+        this.location = new Location(Bukkit.getWorlds().get(0), ingame.getX(), 64, ingame.getY());
         this.direction = direction;
         this.directionSpeed = speed;
         this.windsMph = windSpeed;

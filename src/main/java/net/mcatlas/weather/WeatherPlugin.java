@@ -65,7 +65,7 @@ public class WeatherPlugin extends JavaPlugin {
         boolean enableTropicalCyclones = getConfig().getBoolean("enableTropicalCyclones", true);
 
         if (enableWeatherStatus || enableTornadoes || enableTropicalCyclones) {
-            this.jsonHandler = new JsonHandler();
+            this.jsonHandler = new JsonHandler(plugin);
 
             if (enableTornadoes || enableTropicalCyclones) {
                 Bukkit.getScheduler().runTaskLater(this, () -> {
@@ -122,10 +122,6 @@ public class WeatherPlugin extends JavaPlugin {
 
     public TornadoHandler getTornadoHandler() {
         return tornadoHandler;
-    }
-
-    public TropicalCycloneHandler getTropicalCycloneHandler() {
-        return tropicalCycloneHandler;
     }
 
     public WeatherStatusHandler getWeatherStatusHandler() {

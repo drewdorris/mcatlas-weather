@@ -31,5 +31,43 @@ public class TropicalCyclone {
         this.forecasts = forecasts;
     }
 
+    public String getName() {
+        return name;
+    }
 
+    public Location getLocation() {
+        return location;
+    }
+
+    public Coordinate getIrlLocation() {
+        return irlLocation;
+    }
+
+    public String getDirection() {
+        return direction;
+    }
+
+    public double getDirectionSpeed() {
+        return directionSpeed;
+    }
+
+    public double getWindsMph() {
+        return windsMph;
+    }
+
+    public double getPressure() {
+        return pressure;
+    }
+
+    public String getDateLastUpdated() {
+        return dateLastUpdated;
+    }
+
+    public Coordinate[] getCone() {
+        return cone;
+    }
+
+    public Forecast[] getForecasts() {
+        return forecasts;
+    }
 }

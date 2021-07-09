@@ -1,32 +1,8 @@
 package net.mcatlas.weather;
 
-import com.google.gson.JsonElement;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import net.mcatlas.weather.handlers.*;
-import net.mcatlas.weather.model.*;
 import org.bukkit.*;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarFlag;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.boss.BossBar;
-import org.bukkit.entity.*;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.awt.Color;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-
-import static net.mcatlas.weather.WeatherUtil.*;
 
 /**
  * Handles elements of the MCAtlas world itself.

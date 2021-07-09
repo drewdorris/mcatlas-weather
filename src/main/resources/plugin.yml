@@ -1,0 +1,9 @@
+main: ${mainClass}
+name: ${name}
+version: ${version}
+authors: [StupidDrew9]
+api-version: 1.16
+depend: [dynmap]
+load: STARTUP
+commands: 
+  weatherhere:

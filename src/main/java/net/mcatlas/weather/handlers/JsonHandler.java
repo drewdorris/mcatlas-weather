@@ -18,6 +18,12 @@ import java.util.*;
 
 public class JsonHandler {
 
+    private WeatherPlugin plugin;
+
+    public JsonHandler(WeatherPlugin plugin) {
+        this.plugin = plugin;
+    }
+
     public JsonElement getJsonFromURL(String urlString) {
         URL url = null;
         HttpURLConnection connection = null;
@@ -38,11 +44,11 @@ public class JsonHandler {
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
-            if (code == 500 && WeatherPlugin.get().isApiOffline()) { // api is known to be offline
+            if (code == 500 && plugin.isApiOffline()) { // api is known to be offline
                 return null;
-            } else if (code == 500 && !WeatherPlugin.get().isApiOffline()) { // api is not known to be offline
+            } else if (code == 500 && !plugin.isApiOffline()) { // api is not known to be offline
                 Bukkit.getLogger().warning(urlString + " down?");
-                WeatherPlugin.get().setApiOffline();
+                plugin.setApiOffline();
                 return null;
             } else if (code == 400) { // bad request (happens occasionally)
                 return null;
@@ -73,7 +79,7 @@ public class JsonHandler {
             json = new JsonParser().parse(reader);
         } catch (Exception e) {
             // do something
-            WeatherPlugin.get().getLogger().warning("FILE NOT FOUND");
+            plugin.getLogger().warning("FILE NOT FOUND");
             e.printStackTrace();
             return null;
         }
@@ -126,9 +132,9 @@ public class JsonHandler {
         WeatherData data = new WeatherData(x, z, weatherDesc, weatherFullDesc, temp, pressure, humidity, windSpeed,
                 windDirection, windGust, cloudy, visibility, name);
 
-        if (WeatherPlugin.get().isApiOffline()) {
+        if (plugin.isApiOffline()) {
             Bukkit.getLogger().info("OpenWeatherMap is back online.");
-            WeatherPlugin.get().setApiOnline();
+            plugin.setApiOnline();
         }
 
         return data;
@@ -146,7 +152,7 @@ public class JsonHandler {
             JsonElement stormElement = entry.getValue();
             JsonObject stormObj = stormElement.getAsJsonObject();
             if (stormElement == null || stormElement.isJsonNull()) {
-                WeatherPlugin.get().getLogger().warning("Storm Null");
+                plugin.getLogger().warning("Storm Null");
                 continue;
             }
             boolean active = stormObj.get("active").getAsBoolean();
@@ -155,7 +161,7 @@ public class JsonHandler {
             JsonArray properties = stormObj.get("history").getAsJsonArray();
             JsonElement lastHistory = properties.get(properties.size() - 1);
             if (lastHistory == null || lastHistory.isJsonNull()) {
-                WeatherPlugin.get().getLogger().warning("Event Null");
+                plugin.getLogger().warning("Event Null");
                 continue;
             }
             JsonObject lastHistoryObj = lastHistory.getAsJsonObject();
@@ -209,22 +215,22 @@ public class JsonHandler {
         for (JsonElement alert : alerts) {
             JsonObject alertObj = alert.getAsJsonObject();
             if (alertObj == null || alertObj.isJsonNull()) {
-                WeatherPlugin.get().getLogger().warning("Alert Null");
+                plugin.getLogger().warning("Alert Null");
                 continue;
             }
             JsonObject properties = alertObj.get("properties").getAsJsonObject();
             JsonElement eventObj = properties.get("event");
             if (eventObj == null || eventObj.isJsonNull()) {
-                WeatherPlugin.get().getLogger().warning("Event Null");
+                plugin.getLogger().warning("Event Null");
                 continue;
             }
             String event = eventObj.getAsString();
             if (!event.equals("Tornado Warning")) continue;
 
             JsonElement areaObj = properties.get("areaDesc");
-            String area = "";
+            String area;
             if (areaObj == null || areaObj.isJsonNull()) {
-                WeatherPlugin.get().getLogger().warning("Area Null");
+                plugin.getLogger().warning("Area Null");
                 area = "Unknown";
             } else {
                 area = areaObj.getAsString();
@@ -234,13 +240,13 @@ public class JsonHandler {
 
             JsonArray eventMotion = parameters.getAsJsonArray("eventMotionDescription");
             if (eventMotion == null || eventMotion.isJsonNull()) {
-                WeatherPlugin.get().getLogger().warning("Event Motion Null");
+                plugin.getLogger().warning("Event Motion Null");
                 continue;
             }
 
             JsonElement descElement = eventMotion.get(0);
             if (descElement == null || descElement.isJsonNull()) {
-                WeatherPlugin.get().getLogger().warning("Event Desc Null");
+                plugin.getLogger().warning("Event Desc Null");
                 continue;
             }
             String desc = descElement.getAsString();
@@ -248,9 +254,9 @@ public class JsonHandler {
                     .replace("...", "");
 
             String latStr = coords.substring(0, coords.indexOf(","));
-            double lat = Double.valueOf(latStr);
+            double lat = Double.parseDouble(latStr);
             String lonStr = coords.substring(coords.lastIndexOf(",") + 1);
-            double lon = Double.valueOf(lonStr);
+            double lon = Double.parseDouble(lonStr);
 
             Coordinate coord = Coordinate.getMCFromLife(lat, lon);
 

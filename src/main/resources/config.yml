@@ -1,6 +1,6 @@
 enableTornadoes: true
 enableTropicalCyclones: true
-enableRegularWeather: true
+enableWeatherStatus: true
 apiKey: asdf123
 scaling: 120
 minutesBetweenTornadoAlerts: 10

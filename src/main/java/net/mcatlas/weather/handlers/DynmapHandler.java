@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class DynmapHandler {
+
     private DynmapAPI api;
     private MarkerAPI markerapi;
     private MarkerSet stormMarkerSet;
@@ -22,8 +23,18 @@ public class DynmapHandler {
     private Set<MarkerDescription> tornadoMarkers;
     private Set<MarkerDescription> stormMarkers;
 
-    public DynmapHandler() {
-        Plugin dynmap = WeatherPlugin.get().getServer().getPluginManager().getPlugin("dynmap");
+    private final String stormInfoWindow;
+    private final String forecastInfoWindow;
+
+    private WeatherPlugin plugin;
+
+    public DynmapHandler(WeatherPlugin plugin, String stormInfoWindow, String forecastInfoWindow) {
+        this.plugin = plugin;
+
+        this.stormInfoWindow = stormInfoWindow;
+        this.forecastInfoWindow = forecastInfoWindow;
+
+        Plugin dynmap = plugin.getServer().getPluginManager().getPlugin("dynmap");
         if (dynmap == null) {
             Bukkit.getLogger().warning("Dynmap not found!!");
             return;
@@ -105,7 +116,7 @@ public class DynmapHandler {
             }
             Marker marker = stormMarkerSet.createMarker(storm.getName(), storm.getName(), storm.getLocation().getWorld().getName(),
                     storm.getLocation().getX(), 64, storm.getLocation().getZ(), markerapi.getMarkerIcon(cycloneIcon), false);
-            String stormDesc = WeatherPlugin.get().getConfig().getString("storminfowindow");
+            String stormDesc = stormInfoWindow;
             stormDesc = stormDesc.replace("%stormname%", storm.getName());
             stormDesc = stormDesc.replace("%directionandspeed%", "Going " + storm.getDirection() + " at " + (int) storm.getDirectionSpeed() + " mph");
             stormDesc = stormDesc.replace("%windspeed%", (int) storm.getWindsMph() + " mph");
@@ -135,7 +146,7 @@ public class DynmapHandler {
                         forecast.getLocation().getWorld().getName(),
                         forecast.getLocation().getX(), 64, forecast.getLocation().getZ(),
                         markerapi.getMarkerIcon(forecastIcon), false);
-                String forecastDesc = WeatherPlugin.get().getConfig().getString("forecastinfowindow");
+                String forecastDesc = forecastInfoWindow;
                 forecastDesc = forecastDesc.replace("%stormname%", storm.getName());
                 forecastDesc = forecastDesc.replace("%date%", forecast.getTime());
                 forecastDesc = forecastDesc.replace("%windspeed%", (int) forecast.getWindsMph() + " mph");

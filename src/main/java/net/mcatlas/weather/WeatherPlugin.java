@@ -60,17 +60,18 @@ public class WeatherPlugin extends JavaPlugin {
         this.apiKey = getConfig().getString("apiKey", null);
         this.scaling = getConfig().getDouble("scaling");
 
-        boolean enableWeather = getConfig().getBoolean("enableWeather", true);
-        boolean enableWeatherStatus = true;
-        boolean enableTornadoes = true;
-        boolean enableTropicalCyclones = true;
+        boolean enableWeatherStatus = getConfig().getBoolean("enableWeatherStatus", true);
+        boolean enableTornadoes = getConfig().getBoolean("enableTornadoes", true);
+        boolean enableTropicalCyclones = getConfig().getBoolean("enableTropicalCyclones", true);
 
         if (enableWeatherStatus || enableTornadoes || enableTropicalCyclones) {
             this.jsonHandler = new JsonHandler();
 
             if (enableTornadoes || enableTropicalCyclones) {
                 Bukkit.getScheduler().runTaskLater(this, () -> {
-                    this.dynmapHandler = new DynmapHandler();
+                    String stormInfoWindow = getConfig().getString("storminfowindow");
+                    String forecastInfoWindow = getConfig().getString("forecastinfowindow");
+                    this.dynmapHandler = new DynmapHandler(plugin, stormInfoWindow, forecastInfoWindow);
                 }, 20 * 10);
             }
         }
@@ -81,7 +82,7 @@ public class WeatherPlugin extends JavaPlugin {
         }
 
         if (enableTornadoes) {
-            this.tornadoHandler = new TornadoHandler(this, getConfig().getInt("minutesBetweenTornadoAlerts"));
+            this.tornadoHandler = new TornadoHandler(this, getConfig().getInt("minutesBetweenTornadoAlerts", 10));
         }
 
         if (enableTropicalCyclones) {

@@ -91,10 +91,14 @@ public class DynmapHandler {
         }
     }
 
-    public void createTornadoMarkers(Set<Tornado> tornadoes) {
+    public void resetTornadoMarkers() {
         for (MarkerDescription marker : tornadoMarkers) {
             marker.deleteMarker();
         }
+    }
+
+    public void createTornadoMarkers(Set<Tornado> tornadoes) {
+        resetTornadoMarkers();
         int i = 0;
         for (Tornado tornado : tornadoes) {
             i++;
@@ -103,10 +107,14 @@ public class DynmapHandler {
         }
     }
 
-    public void createTropicalCycloneMarkers(Set<TropicalCyclone> storms) {
+    public void resetTropicalCycloneMarkers() {
         for (MarkerDescription marker : stormMarkers) {
             marker.deleteMarker();
         }
+    }
+
+    public void createTropicalCycloneMarkers(Set<TropicalCyclone> storms) {
+        resetTropicalCycloneMarkers();
         for (TropicalCyclone storm : storms) {
             String cycloneIcon = "wx_td";
             if (storm.getName().contains("Tropical Storm")) {

@@ -20,6 +20,7 @@ public class TropicalCycloneHandler {
     }
 
     public void updateTropicalCyclones() {
+        plugin.getDynmapHandler().resetTropicalCycloneMarkers();
         JsonElement data = plugin.getJsonHandler().getJsonFromURL("https://api.weatherusa.net/v1.2/tropical?storm=active");
         Set<TropicalCyclone> storms = plugin.getJsonHandler().extractTropicalCycloneData(data);
         plugin.getDynmapHandler().createTropicalCycloneMarkers(storms);

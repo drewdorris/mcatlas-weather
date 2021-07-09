@@ -198,6 +198,7 @@ public class TornadoHandler {
 
     // ASYNC
     public void updateTornadoes() {
+        plugin.getDynmapHandler().resetTornadoMarkers();
         JsonElement data = plugin.getJsonHandler().getJsonFromURL("https://api.weather.gov/alerts/active");
         Set<Tornado> updatedTornadoes = plugin.getJsonHandler().extractTornadoData(data);
 

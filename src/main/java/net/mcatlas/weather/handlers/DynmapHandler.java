@@ -117,7 +117,9 @@ public class DynmapHandler {
         resetTropicalCycloneMarkers();
         for (TropicalCyclone storm : storms) {
             String cycloneIcon = "wx_td";
-            if (storm.getName().contains("Tropical Storm")) {
+            if (storm.getName().contains("Post-Tropical")) {
+
+            } else if (storm.getName().contains("Tropical Storm")) {
                 cycloneIcon = "wx_ts";
             } else if (storm.getName().contains("Hurricane")) {
                 cycloneIcon = "wx_hu";

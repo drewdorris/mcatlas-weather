@@ -49,7 +49,7 @@ public class TornadoHandler {
 
         Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             launchEntitiesInTornado();
-        }, 10 * 20L, 20L);
+        }, 10 * 20L, 15L);
     }
 
     public int getMinutesBetweenTornadoAlerts() {

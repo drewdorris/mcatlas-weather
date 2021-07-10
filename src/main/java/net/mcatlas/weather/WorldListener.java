@@ -1,11 +1,15 @@
 package net.mcatlas.weather;
 
 import net.mcatlas.weather.handlers.WeatherStatusHandler;
+import net.mcatlas.weather.model.TropicalCyclone;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.world.WorldInitEvent;
 
@@ -38,12 +42,38 @@ public class WorldListener implements Listener {
 		WeatherPlugin.get().getWeatherStatusHandler().addPlayerToQueue(event.getPlayer(), WeatherStatusHandler.WeatherPriority.JOIN);
 	}
 
-	/*
 	// When block is placed
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBlockPlace(BlockPlaceEvent event) {
+		Location location = event.getBlock().getLocation();
+		if (WeatherPlugin.get().getTropicalCycloneHandler() != null) {
+			location.setY(64);
+			for (TropicalCyclone cyclone : WeatherPlugin.get().getTropicalCycloneHandler().getCyclones()) {
+				double dist = cyclone.getLocation().distance(location);
+				if (dist < 25 && dist > 3) {
+					event.setCancelled(true);
+					event.getPlayer().sendMessage(ChatColor.RED + "Can't place near " + cyclone.getName());
+				}
+			}
+		}
 		// have something for preventing placing near tornadoes
 	}
-	 */
+
+	// When block is placed
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void onBlockBreak(BlockPlaceEvent event) {
+		Location location = event.getBlock().getLocation();
+		if (WeatherPlugin.get().getTropicalCycloneHandler() != null) {
+			location.setY(64);
+			for (TropicalCyclone cyclone : WeatherPlugin.get().getTropicalCycloneHandler().getCyclones()) {
+				double dist = cyclone.getLocation().distance(location);
+				if (dist < 25 && dist > 3) {
+					event.setCancelled(true);
+					event.getPlayer().sendMessage(ChatColor.RED + "Can't place near " + cyclone.getName());
+				}
+			}
+		}
+		// have something for preventing placing near tornadoes
+	}
 
 }

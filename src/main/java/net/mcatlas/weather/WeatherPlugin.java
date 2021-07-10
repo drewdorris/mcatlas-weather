@@ -103,4 +103,9 @@ public class WeatherPlugin extends JavaPlugin {
     public WeatherStatusHandler getWeatherStatusHandler() {
         return weatherStatusHandler;
     }
+
+    public TropicalCycloneHandler getTropicalCycloneHandler() {
+        return tropicalCycloneHandler;
+    }
+
 }

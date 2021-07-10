@@ -114,7 +114,7 @@ public class TropicalCyclone {
                 for (int j = 0; j < 3; j++) {
                     double randomHeight = RANDOM.nextDouble() * 2;
                     for (double height = .5 + randomHeight; height < 20; height += Math.sqrt(height) / 2) {
-                        double width = 3.5;
+                        double width = 3.75;
                         double radian = RANDOM.nextDouble() * (Math.PI * 2);
                         // outsideOfEye makes the particles go a little out of the eye but still stay near the eye
                         int outsideOfEye = (int) (RANDOM.nextDouble() * 31.62); // sqrt(1000)

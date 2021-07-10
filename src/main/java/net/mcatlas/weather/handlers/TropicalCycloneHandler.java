@@ -89,14 +89,14 @@ public class TropicalCycloneHandler {
                 double dist = location.distance(cycloneLoc);
                 if (dist < 0.1) dist = .1; // if its 0 or near 0 it will be an issue for the vector
                 // within 50 blocks of eye, not within eye, less than y=200, not currently in cyclone
-                if (dist < 50 && dist > 2.5 && playerY < 200 &&
+                if (dist < 35 + (cyclone.getWindsMph() / 8) && dist > 2.5 && playerY < 200 &&
                         !playersCurrentlyInCyclone.contains(player.getUniqueId())) {
                     inBossBarZone = true;
 
                     // send them flying
-                    org.bukkit.util.Vector dir = cycloneLoc.toVector().subtract(location.toVector()).normalize().multiply(30 / dist);
+                    org.bukkit.util.Vector dir = cycloneLoc.toVector().subtract(location.toVector()).normalize();//.multiply(30 / dist);
                     dir = dir.getCrossProduct(new Vector(0, 1, 0));
-                    org.bukkit.util.Vector vector = new org.bukkit.util.Vector(dir.getX(), 8 / dist, dir.getZ());
+                    org.bukkit.util.Vector vector = new org.bukkit.util.Vector(dir.getX(), 10 / dist, dir.getZ());
                     
                     player.setVelocity(vector);
                     playersCurrentlyInCyclone.add(player.getUniqueId());
@@ -107,7 +107,7 @@ public class TropicalCycloneHandler {
                             Location currentPlayerLoc = player.getLocation();
                             currentPlayerLoc.setY(y);
                             double newDist = currentPlayerLoc.distance(cycloneLoc);
-                            player.setVelocity(vector.rotateAroundY(Math.PI / (4 + Math.sqrt(newDist * 14))).multiply(1.06));
+                            player.setVelocity(vector.rotateAroundY(Math.PI / (4 + Math.sqrt(newDist * 13))).multiply(1.06));
                         }, iter * 3L);
                     }
                     Bukkit.getScheduler().runTaskLater(plugin,

@@ -46,6 +46,9 @@ public class WorldListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBlockPlace(BlockPlaceEvent event) {
 		Location location = event.getBlock().getLocation();
+		if (location.getWorld().getEnvironment() != World.Environment.NORMAL) {
+			return;
+		}
 		if (WeatherPlugin.get().getTropicalCycloneHandler() != null) {
 			location.setY(64);
 			for (TropicalCyclone cyclone : WeatherPlugin.get().getTropicalCycloneHandler().getCyclones()) {
@@ -63,6 +66,9 @@ public class WorldListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBlockBreak(BlockPlaceEvent event) {
 		Location location = event.getBlock().getLocation();
+		if (location.getWorld().getEnvironment() != World.Environment.NORMAL) {
+			return;
+		}
 		if (WeatherPlugin.get().getTropicalCycloneHandler() != null) {
 			location.setY(64);
 			for (TropicalCyclone cyclone : WeatherPlugin.get().getTropicalCycloneHandler().getCyclones()) {

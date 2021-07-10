@@ -58,6 +58,7 @@ public class TropicalCycloneHandler {
         for (TropicalCyclone cyclone : cyclones) {
             cyclone.spawn();
         }
+        plugin.getLogger().info(cyclones.size() + " cyclones total");
     }
 
     public void launchEntitiesInCyclone() {

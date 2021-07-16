@@ -12,6 +12,7 @@ import static net.mcatlas.weather.WeatherUtil.*;
 public class TropicalCyclone {
 
     private String name;
+    private String shortName;
     private Location location;
     private Coordinate irlLocation;
     private String direction;
@@ -27,9 +28,10 @@ public class TropicalCyclone {
     public static final Particle.DustOptions DUST_OPTIONS =
             new Particle.DustOptions(org.bukkit.Color.fromRGB(128, 128, 128), 10);
 
-    public TropicalCyclone(String name, double lat, double lon, String direction, double speed,
+    public TropicalCyclone(String name, String shortName, double lat, double lon, String direction, double speed,
                            double windSpeed, double pressure, String date, Coordinate[] cone, Forecast[] forecasts) {
         this.name = name;
+        this.shortName = shortName;
         this.irlLocation = new Coordinate(lat, lon);
         Coordinate ingame = Coordinate.getMCFromLife(lat, lon);
         this.location = new Location(Bukkit.getWorlds().get(0), ingame.getX(), 64, ingame.getY());
@@ -44,6 +46,10 @@ public class TropicalCyclone {
 
     public String getName() {
         return name;
+    }
+
+    public String getShortName() {
+        return shortName;
     }
 
     public Location getLocation() {
@@ -110,7 +116,6 @@ public class TropicalCyclone {
                 }
                  */
 
-
                 for (int j = 0; j < 3; j++) {
                     double randomHeight = RANDOM.nextDouble() * 2;
                     for (double height = .5 + randomHeight; height < 20; height += Math.sqrt(height) / 2) {
@@ -133,7 +138,7 @@ public class TropicalCyclone {
                     }
                 }
             }
-        }.runTaskTimer(WeatherPlugin.get(), 10L, 2L);
+        }.runTaskTimer(WeatherPlugin.get(), 10L, 3L);
     }
 
 }

@@ -168,37 +168,50 @@ public class JsonHandler {
             }
             JsonObject lastHistoryObj = lastHistory.getAsJsonObject();
             String name = lastHistoryObj.get("name").getAsString();
+            if (name.contains("Disturbance")) { // this will make stuff null if its disturbance
+                continue;
+            }
+            String shortName = lastHistoryObj.get("name_short").getAsString();
             String date = lastHistoryObj.get("date").getAsString();
             double lat = lastHistoryObj.get("lat").getAsDouble();
             double lon = lastHistoryObj.get("lon").getAsDouble();
+            if (lastHistoryObj.get("dir") == null) {
+                // this will be the first thing null if its some disturbance or something with lack of info
+                continue;
+            }
             String direction = lastHistoryObj.get("dir").getAsString();
             double directionSpeed = lastHistoryObj.get("speed").getAsDouble();
             double windSpeed = lastHistoryObj.get("winds").getAsDouble();
             double pressure = lastHistoryObj.get("pressure").getAsDouble();
 
-            JsonArray forecasts = stormObj.get("forecast").getAsJsonArray();
             List<Forecast> stormForecasts = new ArrayList<>();
-            for (JsonElement forecast : forecasts) {
-                JsonObject forecastObj = forecast.getAsJsonObject();
-                String fDate = forecastObj.get("time").getAsString();
-                double fLat = forecastObj.get("lat").getAsDouble();
-                double fLon = forecastObj.get("lon").getAsDouble();
-                double fWindSpeed = forecastObj.get("winds_mph").getAsDouble();
-                Forecast stormForecast = new Forecast(fDate, fLat, fLon, fWindSpeed);
-                stormForecasts.add(stormForecast);
+            if (stormObj.get("forecast") != null) {
+                JsonArray forecasts = stormObj.get("forecast").getAsJsonArray();
+
+                for (JsonElement forecast : forecasts) {
+                    JsonObject forecastObj = forecast.getAsJsonObject();
+                    String fDate = forecastObj.get("time").getAsString();
+                    double fLat = forecastObj.get("lat").getAsDouble();
+                    double fLon = forecastObj.get("lon").getAsDouble();
+                    double fWindSpeed = forecastObj.get("winds_mph").getAsDouble();
+                    Forecast stormForecast = new Forecast(fDate, fLat, fLon, fWindSpeed);
+                    stormForecasts.add(stormForecast);
+                }
             }
             Forecast[] forecastsArray = stormForecasts.toArray(new Forecast[0]);
 
-            JsonArray coneCoordsArr = stormObj.get("cone").getAsJsonArray();
             List<Coordinate> coordinates = new ArrayList<>();
-            for (JsonElement coneCoordElement : coneCoordsArr) {
-                JsonArray coneCoord = coneCoordElement.getAsJsonArray();
-                Coordinate coord = new Coordinate(coneCoord.get(0).getAsDouble(), coneCoord.get(1).getAsDouble());
-                coordinates.add(coord);
+            if (stormObj.get("cone") != null) { // occasionally not there for some reason
+                JsonArray coneCoordsArr = stormObj.get("cone").getAsJsonArray();
+                for (JsonElement coneCoordElement : coneCoordsArr) {
+                    JsonArray coneCoord = coneCoordElement.getAsJsonArray();
+                    Coordinate coord = new Coordinate(coneCoord.get(0).getAsDouble(), coneCoord.get(1).getAsDouble());
+                    coordinates.add(coord);
+                }
             }
             Coordinate[] coneCoordinates = coordinates.toArray(new Coordinate[0]);
 
-            TropicalCyclone storm = new TropicalCyclone(name, lat, lon, direction,
+            TropicalCyclone storm = new TropicalCyclone(name, shortName, lat, lon, direction,
                     directionSpeed, windSpeed, pressure, date, coneCoordinates, forecastsArray);
             tropicalCyclones.add(storm);
         }

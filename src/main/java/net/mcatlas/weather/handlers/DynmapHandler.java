@@ -128,6 +128,7 @@ public class DynmapHandler {
                     storm.getLocation().getX(), 64, storm.getLocation().getZ(), markerapi.getMarkerIcon(cycloneIcon), false);
             String stormDesc = stormInfoWindow;
             stormDesc = stormDesc.replace("%stormname%", storm.getName());
+            stormDesc = stormDesc.replace("%category%", storm.getCategory().formatted);
             stormDesc = stormDesc.replace("%directionandspeed%", "Going " + storm.getDirection() + " at " + (int) storm.getDirectionSpeed() + " mph");
             stormDesc = stormDesc.replace("%windspeed%", (int) storm.getWindsMph() + " mph");
             stormDesc = stormDesc.replace("%pressure%", "" + (int) storm.getPressure() + " mbar");
@@ -144,14 +145,23 @@ public class DynmapHandler {
             zz[i] = storm.getLocation().getBlockZ();
             for (Forecast forecast : storm.getForecasts()) {
                 String forecastIcon = "wx_f_td";
-                if (forecast.getWindsMph() < 74 && forecast.getWindsMph() > 38) {
-                    forecastIcon = "wx_f_ts";
-                } else if (forecast.getWindsMph() > 73 && forecast.getWindsMph() < 111) {
-                    forecastIcon = "wx_f_hu";
-                } else if (forecast.getWindsMph() > 110) {
-                    forecastIcon = "wx_f_mh";
+                switch (forecast.getCategory()) {
+                    case TROPICAL_STORM:
+                        forecastIcon = "wx_f_ts";
+                        break;
+                    case CAT_1:
+                    case CAT_2:
+                        forecastIcon = "wx_f_hu";
+                        break;
+                    case CAT_3:
+                    case CAT_4:
+                    case CAT_5:
+                        forecastIcon = "wx_f_mh";
+                        break;
                 }
+
                 i++;
+
                 Marker forecastMarker = stormMarkerSet.createMarker(storm.getName() + i, storm.getName() + " " + forecast.getTime(),
                         forecast.getLocation().getWorld().getName(),
                         forecast.getLocation().getX(), 64, forecast.getLocation().getZ(),
@@ -159,6 +169,7 @@ public class DynmapHandler {
                 String forecastDesc = forecastInfoWindow;
                 forecastDesc = forecastDesc.replace("%stormname%", storm.getName());
                 forecastDesc = forecastDesc.replace("%date%", forecast.getTime());
+                forecastDesc = forecastDesc.replace("%category%", forecast.getCategory().formatted);
                 forecastDesc = forecastDesc.replace("%windspeed%", (int) forecast.getWindsMph() + " mph");
                 forecastMarker.setDescription(forecastDesc);
                 stormMarkers.add(forecastMarker);

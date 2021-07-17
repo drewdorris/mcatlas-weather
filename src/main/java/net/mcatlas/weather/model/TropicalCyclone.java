@@ -17,6 +17,7 @@ public class TropicalCyclone {
     private Coordinate irlLocation;
     private String direction;
     private double directionSpeed;
+    private Category category;
     private double windsMph;
     private double pressure;
     private String dateLastUpdated;
@@ -28,7 +29,7 @@ public class TropicalCyclone {
     public static final Particle.DustOptions DUST_OPTIONS =
             new Particle.DustOptions(org.bukkit.Color.fromRGB(128, 128, 128), 10);
 
-    public TropicalCyclone(String name, String shortName, double lat, double lon, String direction, double speed,
+    public TropicalCyclone(String name, String shortName, double lat, double lon, String direction, double speed, Category category,
                            double windSpeed, double pressure, String date, Coordinate[] cone, Forecast[] forecasts) {
         this.name = name;
         this.shortName = shortName;
@@ -37,6 +38,7 @@ public class TropicalCyclone {
         this.location = new Location(Bukkit.getWorlds().get(0), ingame.getX(), 64, ingame.getY());
         this.direction = direction;
         this.directionSpeed = speed;
+        this.category = category;
         this.windsMph = windSpeed;
         this.pressure = pressure;
         this.dateLastUpdated = date;
@@ -66,6 +68,10 @@ public class TropicalCyclone {
 
     public double getDirectionSpeed() {
         return directionSpeed;
+    }
+
+    public Category getCategory() {
+        return category;
     }
 
     public double getWindsMph() {
@@ -104,7 +110,7 @@ public class TropicalCyclone {
                     location.setY(getHighestSolidBlockYAt(location) + 1.5);
                 });
 
-                Collection<Player> nearbyPlayers = Bukkit.getWorlds().get(0).getNearbyPlayers(location, 150);
+                Collection<Player> nearbyPlayers = Bukkit.getWorlds().get(0).getNearbyPlayers(location, 110 + (5 * category.power));
 
                 /*
                 for (Player player : nearbyPlayers) {

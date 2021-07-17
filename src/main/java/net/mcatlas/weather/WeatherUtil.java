@@ -1,5 +1,6 @@
 package net.mcatlas.weather;
 
+import net.mcatlas.weather.model.Category;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 
@@ -77,6 +78,17 @@ public class WeatherUtil {
 
     public static String degreesToCardinal(double degrees) {
         return directions[(int) Math.round(((double) degrees % 360) / 45)];
+    }
+
+    public static Category getCategory(double mph) {
+        if (mph <= 38) return Category.TROPICAL_DEPRESSION;
+        if (mph > 38 && mph < 74) return Category.TROPICAL_STORM;
+        if (mph >= 74 && mph < 96) return Category.CAT_1;
+        if (mph >= 96 && mph < 111) return Category.CAT_2;
+        if (mph >= 111 && mph < 130) return Category.CAT_3;
+        if (mph >= 130 && mph < 157) return Category.CAT_4;
+        if (mph >= 157) return Category.CAT_5;
+        return null;
     }
 
     public static int getHighestSolidBlockYAt(Location location) {

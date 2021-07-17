@@ -6,5 +6,5 @@ scaling: 120
 minutesBetweenTornadoAlerts: 10
 
 # Format for popup - substitute values for macros
-storminfowindow: '<div class="storminfowindow"><span style="font-size:120%;"><b>%stormname%</b></span><hr /><b>Speed: </b>%windspeed%<br /><b>Direction: </b>%directionandspeed%<br /><b>Pressure: </b>%pressure%<br /><b>As of </b>%date%</div>'
-forecastinfowindow: '<div class="forecastinfowindow"><span style="font-size:120%;"><b>%stormname%</b></span><br /><b>Speed: </b>%windspeed%<br /><b>On: </b>%date%</div>'
+storminfowindow: '<div class="storminfowindow"><span style="font-size:120%;"><b>%stormname%</b></span><br />%category%<hr /><b>Speed: </b>%windspeed%<br /><b>Direction: </b>%directionandspeed%<br /><b>Pressure: </b>%pressure%<br /><b>As of </b>%date%</div>'
+forecastinfowindow: '<div class="forecastinfowindow"><span style="font-size:120%;"><b>%stormname%</b></span><br />%category%<hr /><b>Speed: </b>%windspeed%<br /><b>On: </b>%date%</div>'

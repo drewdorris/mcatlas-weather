@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.mcatlas.weather.WeatherPlugin;
+import net.mcatlas.weather.WeatherUtil;
 import net.mcatlas.weather.model.*;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Bukkit;
@@ -173,6 +174,7 @@ public class JsonHandler {
             }
             String shortName = lastHistoryObj.get("name_short").getAsString();
             String date = lastHistoryObj.get("date").getAsString();
+            date = date.substring(0, date.length() - 3);
             double lat = lastHistoryObj.get("lat").getAsDouble();
             double lon = lastHistoryObj.get("lon").getAsDouble();
             if (lastHistoryObj.get("dir") == null) {
@@ -182,19 +184,25 @@ public class JsonHandler {
             String direction = lastHistoryObj.get("dir").getAsString();
             double directionSpeed = lastHistoryObj.get("speed").getAsDouble();
             double windSpeed = lastHistoryObj.get("winds").getAsDouble();
+            Category category = WeatherUtil.getCategory(windSpeed);
             double pressure = lastHistoryObj.get("pressure").getAsDouble();
 
             List<Forecast> stormForecasts = new ArrayList<>();
             if (stormObj.get("forecast") != null) {
+                String dateFormatPart = date.substring(0, date.indexOf(" "));
+                dateFormatPart = dateFormatPart.substring(0, dateFormatPart.length() - 2);
                 JsonArray forecasts = stormObj.get("forecast").getAsJsonArray();
 
                 for (JsonElement forecast : forecasts) {
                     JsonObject forecastObj = forecast.getAsJsonObject();
-                    String fDate = forecastObj.get("time").getAsString();
+                    String fDate = dateFormatPart + forecastObj.get("time").getAsString();
+                    fDate = fDate.replace("/", " ");
+                    fDate = fDate.substring(0, fDate.length() - 2) + ":00";
                     double fLat = forecastObj.get("lat").getAsDouble();
                     double fLon = forecastObj.get("lon").getAsDouble();
                     double fWindSpeed = forecastObj.get("winds_mph").getAsDouble();
-                    Forecast stormForecast = new Forecast(fDate, fLat, fLon, fWindSpeed);
+                    Category fCategory = WeatherUtil.getCategory(fWindSpeed);
+                    Forecast stormForecast = new Forecast(fDate, fLat, fLon, fCategory, fWindSpeed);
                     stormForecasts.add(stormForecast);
                 }
             }
@@ -212,7 +220,7 @@ public class JsonHandler {
             Coordinate[] coneCoordinates = coordinates.toArray(new Coordinate[0]);
 
             TropicalCyclone storm = new TropicalCyclone(name, shortName, lat, lon, direction,
-                    directionSpeed, windSpeed, pressure, date, coneCoordinates, forecastsArray);
+                    directionSpeed, category, windSpeed, pressure, date, coneCoordinates, forecastsArray);
             tropicalCyclones.add(storm);
         }
 

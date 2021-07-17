@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class JsonHandler {
@@ -72,8 +73,7 @@ public class JsonHandler {
     }
 
     // THIS IS FOR TESTING ONLY
-    // example input "plugins/mcatlas-environment/tropicalstorms.json"
-    /*
+    // example input "plugins/mcatlas-weather/tropicalstorms.json"
     public JsonElement getJsonFromLocal(String jsonLocation) {
         JsonElement json = null;
 
@@ -88,7 +88,6 @@ public class JsonHandler {
 
         return json;
     }
-     */
 
     @Nullable
     public WeatherData extractWeatherData(JsonElement json, Location location) {
@@ -188,7 +187,7 @@ public class JsonHandler {
             double pressure = lastHistoryObj.get("pressure").getAsDouble();
 
             List<Forecast> stormForecasts = new ArrayList<>();
-            if (stormObj.get("forecast") != null) {
+            if (stormObj.get("forecast") != null && stormObj.get("forecast").isJsonArray()) {
                 String dateFormatPart = date.substring(0, date.indexOf(" "));
                 dateFormatPart = dateFormatPart.substring(0, dateFormatPart.length() - 2);
                 JsonArray forecasts = stormObj.get("forecast").getAsJsonArray();
@@ -209,7 +208,7 @@ public class JsonHandler {
             Forecast[] forecastsArray = stormForecasts.toArray(new Forecast[0]);
 
             List<Coordinate> coordinates = new ArrayList<>();
-            if (stormObj.get("cone") != null) { // occasionally not there for some reason
+            if (stormObj.get("cone") != null && stormObj.get("cone").isJsonArray()) { // occasionally not there for some reason
                 JsonArray coneCoordsArr = stormObj.get("cone").getAsJsonArray();
                 for (JsonElement coneCoordElement : coneCoordsArr) {
                     JsonArray coneCoord = coneCoordElement.getAsJsonArray();

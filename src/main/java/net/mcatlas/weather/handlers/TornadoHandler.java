@@ -92,7 +92,7 @@ public class TornadoHandler {
                     org.bukkit.util.Vector vector = new org.bukkit.util.Vector(dir.getX(), 20 + (1 * (5 / dist)), dir.getZ());
                     player.setVelocity(vector);
 
-                    for (int i = 1; i < RANDOM.nextInt(20); i++) {
+                    for (int i = 1; i < RANDOM.nextInt(30); i++) {
                         Bukkit.getScheduler().runTaskLater(plugin, () -> {
                             player.setVelocity(vector.rotateAroundY(Math.PI / 6).multiply(1.1));
                         }, i * 2L);
@@ -200,6 +200,7 @@ public class TornadoHandler {
     public void updateTornadoes() {
         plugin.getDynmapHandler().resetTornadoMarkers();
         JsonElement data = plugin.getJsonHandler().getJsonFromURL("https://api.weather.gov/alerts/active");
+        //JsonElement data = plugin.getJsonHandler().getJsonFromLocal("plugins/mcatlas-environment/tornadoes.json");
         Set<Tornado> updatedTornadoes = plugin.getJsonHandler().extractTornadoData(data);
 
         // this.tornadoes = updatedTornadoes.stream().filter(t -> this.tornadoes.contains(t)).collect(Collectors.toSet());

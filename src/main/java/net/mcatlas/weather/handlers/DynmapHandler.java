@@ -116,14 +116,8 @@ public class DynmapHandler {
     public void createTropicalCycloneMarkers(Set<TropicalCyclone> storms) {
         resetTropicalCycloneMarkers();
         for (TropicalCyclone storm : storms) {
-            String cycloneIcon = "wx_td";
-            if (storm.getName().contains("Post-Tropical")) {
+            String cycloneIcon = storm.getCategory().formatted.toLowerCase().replace(" ", "_");
 
-            } else if (storm.getName().contains("Tropical Storm")) {
-                cycloneIcon = "wx_ts";
-            } else if (storm.getName().contains("Hurricane")) {
-                cycloneIcon = "wx_hu";
-            }
             Marker marker = stormMarkerSet.createMarker(storm.getName(), storm.getName(), storm.getLocation().getWorld().getName(),
                     storm.getLocation().getX(), 64, storm.getLocation().getZ(), markerapi.getMarkerIcon(cycloneIcon), false);
             String stormDesc = stormInfoWindow;

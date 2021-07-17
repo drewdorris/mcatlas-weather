@@ -80,7 +80,8 @@ public class WeatherUtil {
         return directions[(int) Math.round(((double) degrees % 360) / 45)];
     }
 
-    public static Category getCategory(double mph) {
+    public static Category getCategory(String name, double mph) {
+        if (name != null && name.contains("Post-Tropical")) return Category.POST_TROPICAL;
         if (mph <= 38) return Category.TROPICAL_DEPRESSION;
         if (mph > 38 && mph < 74) return Category.TROPICAL_STORM;
         if (mph >= 74 && mph < 96) return Category.CAT_1;

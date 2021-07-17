@@ -184,7 +184,7 @@ public class JsonHandler {
             String direction = lastHistoryObj.get("dir").getAsString();
             double directionSpeed = lastHistoryObj.get("speed").getAsDouble();
             double windSpeed = lastHistoryObj.get("winds").getAsDouble();
-            Category category = WeatherUtil.getCategory(windSpeed);
+            Category category = WeatherUtil.getCategory(name, windSpeed);
             double pressure = lastHistoryObj.get("pressure").getAsDouble();
 
             List<Forecast> stormForecasts = new ArrayList<>();
@@ -201,7 +201,7 @@ public class JsonHandler {
                     double fLat = forecastObj.get("lat").getAsDouble();
                     double fLon = forecastObj.get("lon").getAsDouble();
                     double fWindSpeed = forecastObj.get("winds_mph").getAsDouble();
-                    Category fCategory = WeatherUtil.getCategory(fWindSpeed);
+                    Category fCategory = WeatherUtil.getCategory(null, fWindSpeed);
                     Forecast stormForecast = new Forecast(fDate, fLat, fLon, fCategory, fWindSpeed);
                     stormForecasts.add(stormForecast);
                 }

@@ -90,7 +90,7 @@ public class TropicalCycloneHandler {
                 double dist = location.distance(cycloneLoc);
                 if (dist < 0.1) dist = .1; // if its 0 or near 0 it will be an issue for the vector
                 // within 50 blocks of eye, not within eye, less than y=200, not currently in cyclone
-                if (dist < 35 + (cyclone.getWindsMph() / 8) && dist > 2.5 && playerY < 200 &&
+                if (dist < 35 + (cyclone.getWindsMph() / 8) && dist > cyclone.getEyeRadius() && playerY < 140 + (cyclone.getCategory().power * 6) &&
                         !playersCurrentlyInCyclone.contains(player.getUniqueId())) {
                     inBossBarZone = true;
 
@@ -108,7 +108,7 @@ public class TropicalCycloneHandler {
                             Location currentPlayerLoc = player.getLocation();
                             currentPlayerLoc.setY(y);
                             double newDist = currentPlayerLoc.distance(cycloneLoc);
-                            player.setVelocity(vector.rotateAroundY(Math.PI / (4 + Math.sqrt(newDist * 13))).multiply(1.06));
+                            player.setVelocity(vector.rotateAroundY(Math.PI / (4 + Math.sqrt(newDist * (13 - (cyclone.getCategory().power * 2))))).multiply(1.06));
                         }, iter * 3L);
                     }
                     Bukkit.getScheduler().runTaskLater(plugin,
@@ -119,7 +119,7 @@ public class TropicalCycloneHandler {
                     //}
 
                     // elytra randomly falls off entering tornado
-                    if (chance(5)) {
+                    if (chance(1)) {
                         ItemStack chestplate = player.getInventory().getChestplate();
                         if (chestplate != null && chestplate.getType() == Material.ELYTRA) {
                             player.getInventory().setChestplate(null);
@@ -127,7 +127,7 @@ public class TropicalCycloneHandler {
                         }
                     }
                     // random parts of inventory get blown away when entering tornado
-                    if (chance(25)) {
+                    if (chance(15)) {
                         int invSize = player.getInventory().getSize();
                         boolean someBlownAway = false;
                         for (int i = 0; i < RANDOM.nextInt(5); i++) {

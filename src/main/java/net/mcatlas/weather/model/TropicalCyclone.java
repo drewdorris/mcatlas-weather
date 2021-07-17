@@ -94,6 +94,10 @@ public class TropicalCyclone {
         return forecasts;
     }
 
+    public double getEyeRadius() {
+        return 6 - (.7 * category.power);
+    }
+
     public void cancel() {
         this.cancelled = true;
     }
@@ -110,7 +114,7 @@ public class TropicalCyclone {
                     location.setY(getHighestSolidBlockYAt(location) + 1.5);
                 });
 
-                Collection<Player> nearbyPlayers = Bukkit.getWorlds().get(0).getNearbyPlayers(location, 110 + (5 * category.power));
+                Collection<Player> nearbyPlayers = Bukkit.getWorlds().get(0).getNearbyPlayers(location, 175 - (3 * category.power));
 
                 /*
                 for (Player player : nearbyPlayers) {
@@ -124,14 +128,17 @@ public class TropicalCyclone {
 
                 for (int j = 0; j < 3; j++) {
                     double randomHeight = RANDOM.nextDouble() * 2;
-                    for (double height = .5 + randomHeight; height < 20; height += Math.sqrt(height) / 2) {
-                        double width = 3.75;
+                    for (double height = .5 + randomHeight; height < 20 + category.power; height += Math.sqrt(height) / 2) {
                         double radian = RANDOM.nextDouble() * (Math.PI * 2);
                         // outsideOfEye makes the particles go a little out of the eye but still stay near the eye
-                        int outsideOfEye = (int) (RANDOM.nextDouble() * 31.62); // sqrt(1000)
+                        double scale = 32 - category.power;
+                        int outsideOfEye = (int) (RANDOM.nextDouble() * scale); // sqrt(1000)
                         outsideOfEye *= outsideOfEye;
-                        outsideOfEye = 1000 / (outsideOfEye + 1);
-                        Location spawnParticle = location.clone().add(Math.sin(radian) * width * outsideOfEye, height,  Math.cos(radian) * width * outsideOfEye);
+                        outsideOfEye = (int) (scale * scale) / (outsideOfEye + 1);
+                        Location spawnParticle = location.clone().add(
+                                Math.sin(radian) * getEyeRadius() * outsideOfEye,
+                                height,
+                                Math.cos(radian) * getEyeRadius() * outsideOfEye);
                         for (Player player : nearbyPlayers) {
                             Bukkit.getScheduler().runTaskAsynchronously(WeatherPlugin.get(), () -> {
                                 if (chance(2)) {

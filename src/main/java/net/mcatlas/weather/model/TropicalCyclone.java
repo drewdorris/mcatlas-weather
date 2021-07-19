@@ -6,31 +6,39 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 import static net.mcatlas.weather.WeatherUtil.*;
 
 public class TropicalCyclone {
 
-    private String name;
-    private String shortName;
+    private String id; // EP062021
+    private String name; // Hurricane Felicia
+    private String shortName; // Felicia
     private Location location;
     private Coordinate irlLocation;
-    private String direction;
-    private double directionSpeed;
-    private Category category;
-    private double windsMph;
-    private double pressure;
-    private String dateLastUpdated;
-    private Coordinate[] cone;
-    private Forecast[] forecasts;
+    private String direction; // W
+    private double directionSpeed; // 8 mph
+    private Category category; // Category 4
+    private double windsMph; // 145mph
+    private double pressure; // 947mb
+    private String dateLastUpdated; // 2021-07-15 15:00
+    private Coordinate[] cone; // cone coordinates
+    private Forecast[] forecasts; // forecasted locations
+
+    private Set<UUID> playersWhoReceivedReward;
 
     private boolean cancelled = false;
 
     public static final Particle.DustOptions DUST_OPTIONS =
             new Particle.DustOptions(org.bukkit.Color.fromRGB(128, 128, 128), 10);
 
-    public TropicalCyclone(String name, String shortName, double lat, double lon, String direction, double speed, Category category,
-                           double windSpeed, double pressure, String date, Coordinate[] cone, Forecast[] forecasts) {
+    public TropicalCyclone(String id, String name, String shortName, double lat, double lon,
+                           String direction, double speed, Category category, double windSpeed,
+                           double pressure, String date, Coordinate[] cone, Forecast[] forecasts) {
+        this.id = id;
         this.name = name;
         this.shortName = shortName;
         this.irlLocation = new Coordinate(lat, lon);
@@ -44,6 +52,12 @@ public class TropicalCyclone {
         this.dateLastUpdated = date;
         this.cone = cone;
         this.forecasts = forecasts;
+
+        this.playersWhoReceivedReward = new HashSet<>();
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getName() {
@@ -92,6 +106,18 @@ public class TropicalCyclone {
 
     public Forecast[] getForecasts() {
         return forecasts;
+    }
+
+    public Set<UUID> getPlayersWhoReceivedReward() {
+        return playersWhoReceivedReward;
+    }
+
+    public void addPlayerReceivedReward(UUID uuid) {
+        playersWhoReceivedReward.add(uuid);
+    }
+
+    public void setPlayersWhoReceivedReward(Set<UUID> players) {
+        this.playersWhoReceivedReward = players;
     }
 
     public double getEyeRadius() {

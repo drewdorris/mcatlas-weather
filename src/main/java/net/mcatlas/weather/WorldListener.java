@@ -1,6 +1,7 @@
 package net.mcatlas.weather;
 
 import net.mcatlas.weather.handlers.WeatherStatusHandler;
+import net.mcatlas.weather.model.Tornado;
 import net.mcatlas.weather.model.TropicalCyclone;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -52,14 +53,29 @@ public class WorldListener implements Listener {
 		if (WeatherPlugin.get().getTropicalCycloneHandler() != null) {
 			location.setY(64);
 			for (TropicalCyclone cyclone : WeatherPlugin.get().getTropicalCycloneHandler().getCyclones()) {
-				double dist = cyclone.getLocation().distance(location);
-				if (dist < 25 && dist > 3) {
+				Location cycloneLoc = cyclone.getLocation();
+				cycloneLoc.setY(64);
+				double dist = cycloneLoc.distance(location);
+				if (dist < 25) {
 					event.setCancelled(true);
 					event.getPlayer().sendMessage(ChatColor.RED + "Can't place near " + cyclone.getName());
+					return;
 				}
 			}
 		}
-		// have something for preventing placing near tornadoes
+		if (WeatherPlugin.get().getTornadoHandler() != null) {
+			location.setY(64);
+			for (Tornado tornado : WeatherPlugin.get().getTornadoHandler().getTornadoes()) {
+				Location tornadoLoc = tornado.getLocation();
+				tornadoLoc.setY(64);
+				double dist = tornado.getLocation().distance(location);
+				if (dist < 10) {
+					event.setCancelled(true);
+					event.getPlayer().sendMessage(ChatColor.RED + "Can't place near the " + tornado.getArea() + " tornado");
+					return;
+				}
+			}
+		}
 	}
 
 	// When block is placed
@@ -73,9 +89,10 @@ public class WorldListener implements Listener {
 			location.setY(64);
 			for (TropicalCyclone cyclone : WeatherPlugin.get().getTropicalCycloneHandler().getCyclones()) {
 				double dist = cyclone.getLocation().distance(location);
-				if (dist < 25 && dist > 3) {
+				if (dist < 25) {
 					event.setCancelled(true);
 					event.getPlayer().sendMessage(ChatColor.RED + "Can't place near " + cyclone.getName());
+					return;
 				}
 			}
 		}

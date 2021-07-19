@@ -5,11 +5,11 @@ import org.bukkit.Location;
 
 public class Forecast {
 
-    private String time;
+    private String time; // 2017-07-18 00:00
     private Location location;
     private Coordinate irlLocation;
-    private Category category;
-    private double windsMph;
+    private Category category; // Category 3
+    private double windsMph; // 140mph
 
     public Forecast(String time, double lat, double lon, Category category, double windSpeed) {
         this.time = time;

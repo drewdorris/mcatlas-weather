@@ -22,10 +22,12 @@ public class TropicalCycloneHandler {
     private WeatherPlugin plugin;
 
     private Set<TropicalCyclone> cyclones;
-
     private Set<UUID> playersCurrentlyInCyclone;
-
     private Set<BossBar> bossBars;
+
+    private TropicalCycloneDataHandler dataHandler;
+
+    private boolean loaded = false;
 
     public TropicalCycloneHandler(WeatherPlugin plugin) {
         this.plugin = plugin;
@@ -33,13 +35,21 @@ public class TropicalCycloneHandler {
         this.playersCurrentlyInCyclone = new HashSet<>();
         this.bossBars = new HashSet<>();
 
-        Bukkit.getScheduler().runTaskTimerAsynchronously(WeatherPlugin.get(), () -> {
-            updateTropicalCyclones();
-        }, 20 * 20L, 20 * 60 * 30);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            Bukkit.getScheduler().runTaskTimerAsynchronously(WeatherPlugin.get(), () -> {
+                updateTropicalCyclones();
+            }, 0L, 20 * 60 * 30L); // 30 sec
 
-        Bukkit.getScheduler().runTaskTimer(WeatherPlugin.get(), () -> {
-            launchEntitiesInCyclone();
-        }, 10 * 20L, 21L);
+            Bukkit.getScheduler().runTaskTimer(WeatherPlugin.get(), () -> {
+                launchEntitiesInCyclone();
+            }, 0L, 21L); // every 21 ticks
+
+            dataHandler = new TropicalCycloneDataHandler(plugin);
+        }, 20 * 20L);
+    }
+
+    public boolean isLoaded() {
+        return loaded;
     }
 
     public Set<TropicalCyclone> getCyclones() {
@@ -59,6 +69,7 @@ public class TropicalCycloneHandler {
             cyclone.spawn();
         }
         plugin.getLogger().info(cyclones.size() + " cyclones total");
+        this.loaded = true;
     }
 
     public void launchEntitiesInCyclone() {

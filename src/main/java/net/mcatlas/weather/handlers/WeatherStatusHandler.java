@@ -242,7 +242,7 @@ public class WeatherStatusHandler {
                             return;
                         }
 
-                        Particle.DustOptions dustOptions = new Particle.DustOptions(org.bukkit.Color.fromRGB(128, 128, 128), 2);
+                        Particle.DustOptions dustOptions = new Particle.DustOptions(org.bukkit.Color.fromRGB(128, 128, 128), 4);
 
                         player.spawnParticle(Particle.SMOKE_LARGE,
                                 location.clone().add((WeatherUtil.RANDOM.nextDouble() - .5) * 30, (WeatherUtil.RANDOM.nextDouble() - .25) * 10, (WeatherUtil.RANDOM.nextDouble() - .5) * 30),

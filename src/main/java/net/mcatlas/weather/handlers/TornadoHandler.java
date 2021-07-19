@@ -52,6 +52,10 @@ public class TornadoHandler {
         }, 10 * 20L, 15L);
     }
 
+    public Set<Tornado> getTornadoes() {
+        return this.tornadoes;
+    }
+
     public int getMinutesBetweenTornadoAlerts() {
         return minutesBetweenTornadoAlerts;
     }

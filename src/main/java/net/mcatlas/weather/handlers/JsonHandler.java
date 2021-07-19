@@ -151,6 +151,7 @@ public class JsonHandler {
 
         JsonObject alerts = rootobj.getAsJsonObject("data");
         for (Map.Entry<String, JsonElement> entry : alerts.entrySet()) {
+            String stormId = entry.getKey();
             JsonElement stormElement = entry.getValue();
             if (stormElement == null || stormElement.isJsonNull()) {
                 plugin.getLogger().warning("Storm Null");
@@ -218,7 +219,7 @@ public class JsonHandler {
             }
             Coordinate[] coneCoordinates = coordinates.toArray(new Coordinate[0]);
 
-            TropicalCyclone storm = new TropicalCyclone(name, shortName, lat, lon, direction,
+            TropicalCyclone storm = new TropicalCyclone(stormId, name, shortName, lat, lon, direction,
                     directionSpeed, category, windSpeed, pressure, date, coneCoordinates, forecastsArray);
             tropicalCyclones.add(storm);
         }

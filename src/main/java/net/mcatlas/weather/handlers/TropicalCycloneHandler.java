@@ -5,6 +5,9 @@ import net.mcatlas.weather.WeatherPlugin;
 import net.mcatlas.weather.model.Tornado;
 import net.mcatlas.weather.model.TropicalCyclone;
 import org.bukkit.*;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarFlag;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
@@ -23,7 +26,7 @@ public class TropicalCycloneHandler {
 
     private Set<TropicalCyclone> cyclones;
     private Set<UUID> playersCurrentlyInCyclone;
-    private Set<BossBar> bossBars;
+    private BossBar bossBar;
 
     private TropicalCycloneDataHandler dataHandler;
 
@@ -33,7 +36,15 @@ public class TropicalCycloneHandler {
         this.plugin = plugin;
         this.cyclones = new HashSet<>();
         this.playersCurrentlyInCyclone = new HashSet<>();
-        this.bossBars = new HashSet<>();
+        this.bossBar = Bukkit.createBossBar(ChatColor.WHITE + "" + ChatColor.BOLD + "Tropical Cyclone Warning", BarColor.RED, BarStyle.SOLID, BarFlag.DARKEN_SKY, BarFlag.CREATE_FOG);
+
+        Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+            bossBar.setTitle(ChatColor.WHITE + "" + ChatColor.BOLD + "Tropical Cyclone Warning");
+        }, 0L, 40L);
+
+        Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+            bossBar.setTitle(ChatColor.DARK_RED + "" + ChatColor.BOLD + "Tropical Cyclone Warning");
+        }, 20L, 40L);
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             Bukkit.getScheduler().runTaskTimerAsynchronously(WeatherPlugin.get(), () -> {

@@ -41,10 +41,12 @@ public class TornadoHandler {
 
         Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             tornadoBossBar.setTitle(ChatColor.WHITE + "" + ChatColor.BOLD + "Tornado Warning");
+            tornadoBossBar.setStyle(BarStyle.SEGMENTED_20);
         }, 0L, 40L);
 
         Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             tornadoBossBar.setTitle(ChatColor.DARK_RED + "" + ChatColor.BOLD + "Tornado Warning");
+            tornadoBossBar.setStyle(BarStyle.SOLID);
         }, 20L, 40L);
 
         Bukkit.getScheduler().runTaskTimer(plugin, () -> {

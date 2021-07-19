@@ -28,6 +28,7 @@ public class TropicalCycloneDataHandler {
         }
 
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
+            if (!cycloneHandler.isLoaded()) return;
             refreshPlayers(cycloneHandler.getCyclones());
         }, 0L, 20 * 15L); // every 15sec
     }
@@ -53,13 +54,12 @@ public class TropicalCycloneDataHandler {
     }
 
     public void refreshPlayers(Collection<TropicalCyclone> cyclones) {
-        if (!cycloneHandler.isLoaded()) return;
         for (String cycloneId : dataYaml.getConfigurationSection("cyclones").getKeys(false)) {
             String cycloneSection = "cyclones." + cycloneId;
             Set<String> players = dataYaml.getStringList(cycloneSection).stream().collect(Collectors.toSet());
 
 
-            Optional<TropicalCyclone> matchingCycloneOpt = cycloneHandler.getCyclones().stream().findFirst().filter(c -> c.getId().equals(cycloneId));
+            Optional<TropicalCyclone> matchingCycloneOpt = cyclones.stream().findFirst().filter(c -> c.getId().equals(cycloneId));
 
             if (matchingCycloneOpt.isPresent()) {
                 TropicalCyclone cyclone = matchingCycloneOpt.get();
@@ -78,6 +78,7 @@ public class TropicalCycloneDataHandler {
         }
     }
 
+    // run async
     public void addPlayer(String cycloneId, UUID playerUUID) {
         String section = "cyclones." + cycloneId;
         List<String> players = dataYaml.getStringList(section);
@@ -88,7 +89,7 @@ public class TropicalCycloneDataHandler {
     }
 
     private void save(String section, List<String> players) {
-        dataYaml.set(section, null);
+        dataYaml.set(section, players);
         try {
             dataYaml.save(DATA_FILE_NAME);
         } catch (IOException e) {

@@ -1,6 +1,7 @@
 package net.mcatlas.weather.handlers;
 
 import com.google.gson.JsonElement;
+import net.kyori.adventure.text.Component;
 import net.mcatlas.weather.WeatherPlugin;
 import net.mcatlas.weather.model.Tornado;
 import net.mcatlas.weather.model.TropicalCyclone;
@@ -86,18 +87,11 @@ public class TropicalCycloneHandler {
     public void launchEntitiesInCyclone() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.getWorld().getEnvironment() != World.Environment.NORMAL) {
-                //removeFromBossBar(player);
+                removeFromBossBar(player);
                 continue;
             }
 
             Location location = player.getLocation();
-            int x = location.getBlockX();
-            int z = location.getBlockZ();
-            if (x > 0 || z > 0) {
-                //removeFromBossBar(player);
-                continue; // southern hemisphere
-            }
-            // now only players in north and west hemisphere. USA general area
             int y = location.getWorld().getHighestBlockYAt(location);
             int playerY = location.getBlockY();
 
@@ -141,7 +135,7 @@ public class TropicalCycloneHandler {
                     //}
 
                     // elytra randomly falls off entering tornado
-                    if (chance(1)) {
+                    if (cyclone.getWindsMph() > 110 && chance(1 + ((cyclone.getWindsMph() - 110) / 8))) {
                         ItemStack chestplate = player.getInventory().getChestplate();
                         if (chestplate != null && chestplate.getType() == Material.ELYTRA) {
                             player.getInventory().setChestplate(null);
@@ -191,11 +185,36 @@ public class TropicalCycloneHandler {
                 }
             }
             if (inBossBarZone) {
-                //addToBossBar(player);
+                addToBossBar(player);
             } else {
-                //removeFromBossBar(player);
+                removeFromBossBar(player);
             }
         }
+    }
+
+    public boolean isCycloneProtectionArmor(ItemStack item) {
+        if (item.getType() != Material.LEATHER_HELMET) return false;
+
+        if (!item.getItemMeta().hasLore()) return false;
+
+        List<Component> lore = item.getItemMeta().lore();
+        for (Component lorePiece : lore) {
+            if (lorePiece == null || lorePiece.toString() == null) continue;
+
+            String loreString = lorePiece.toString();
+            if (loreString.contains("Rated for ")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void addToBossBar(Player player) {
+        bossBar.addPlayer(player);
+    }
+
+    public void removeFromBossBar(Player player) {
+        bossBar.removePlayer(player);
     }
 
 }

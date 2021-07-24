@@ -58,7 +58,6 @@ public class TropicalCycloneDataHandler {
             String cycloneSection = "cyclones." + cycloneId;
             Set<String> players = dataYaml.getStringList(cycloneSection).stream().collect(Collectors.toSet());
 
-
             Optional<TropicalCyclone> matchingCycloneOpt = cyclones.stream().findFirst().filter(c -> c.getId().equals(cycloneId));
 
             if (matchingCycloneOpt.isPresent()) {

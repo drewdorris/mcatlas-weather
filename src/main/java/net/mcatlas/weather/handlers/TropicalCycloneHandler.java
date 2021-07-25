@@ -10,10 +10,12 @@ import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
 import java.util.*;
@@ -230,11 +232,21 @@ public class TropicalCycloneHandler {
                 break;
         }
         ItemStack armor = new ItemStack(armorType, 1);
+        ItemMeta meta = armor.getItemMeta();
+        meta.setDisplayName(ChatColor.RED + cyclone.getCategory().formatted + " " +
+                cyclone.getShortName() + " - " + ChatColor.GRAY +  "Withstands " + (int) cyclone.getWindsMph() + "mph");
+        meta.addEnchant(Enchantment.DAMAGE_ALL, 4, true);
+        String stringRated = "Rated for " + (int) cyclone.getWindsMph() + "mph winds";
+        List<String> lore = Arrays.asList(stringRated);
+        meta.setLore(lore);
+        armor.setItemMeta(meta);
         // add lore etc
 
         if (!player.getInventory().addItem(armor).isEmpty()) {
-
+            player.getWorld().dropItem(player.getLocation(), armor);
         }
+
+        cyclone.addPlayerReceivedReward(player.getUniqueId());
     }
 
     public boolean wearingProtectedArmor(Player player, double winds) {
@@ -257,6 +269,7 @@ public class TropicalCycloneHandler {
 
         if (!item.getItemMeta().hasLore()) return -1;
 
+        int highestRating = -1;
         List<Component> lore = item.getItemMeta().lore();
         for (Component lorePiece : lore) {
             if (lorePiece == null || lorePiece.toString() == null) continue;
@@ -266,11 +279,11 @@ public class TropicalCycloneHandler {
                 int indexStart = loreString.indexOf("Rated for ") + 10;
                 String mph = loreString.substring(indexStart + loreString.indexOf(" ", indexStart));
                 // untested
-                System.out.println(mph);
+                System.out.println("\"" + mph + "\"");
                 // parse double and return value
             }
         }
-        return -1;
+        return highestRating;
     }
 
     public void addToBossBar(Player player) {

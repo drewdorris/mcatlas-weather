@@ -105,14 +105,22 @@ public class TropicalCycloneHandler {
 
                 double dist = location.distance(cycloneLoc);
                 if (dist < 0.1) dist = .1; // if its 0 or near 0 it will be an issue for the vector
+
+                if (dist < 150) {
+                    inBossBarZone = true;
+                }
+
+                if (isInCoreEye(cyclone, location, dist) && !cyclone.hasReceivedReward(player.getUniqueId())) {
+                    giveProtectedArmor(player, cyclone);
+                    break;
+                }
+
                 // within 35 + (more depending on wind) blocks of eye, not within eye, less than y=200, not currently in cyclone
                 if (!playersCurrentlyInCyclone.contains(player.getUniqueId()) &&
                         !isInEyeArea(cyclone, location, dist) &&
                         playerY < cyclone.getWindsHeight() &&
                         dist < cyclone.getWindsWidth() &&
                         !wearingProtectedArmor(player, cyclone.getWindsMph())) {
-                    inBossBarZone = true;
-
                     // send them flying
                     org.bukkit.util.Vector dir = cycloneLoc.toVector().subtract(location.toVector()).normalize();//.multiply(30 / dist);
                     dir = dir.getCrossProduct(new Vector(0, 1, 0));
@@ -133,14 +141,7 @@ public class TropicalCycloneHandler {
                     Bukkit.getScheduler().runTaskLater(plugin,
                             () -> playersCurrentlyInCyclone.remove(player.getUniqueId()), iter);
 
-                    if (isInCoreEye(cyclone, location, dist)) {
-                        // give armor and stuff
-                    }
-                    //if (!tornado.playerHasAlreadyReceivedNamedItem(player.getUniqueId())) {
-                        //nameItemInHand(player, tornado);
-                    //}
-
-                    // elytra randomly falls off entering tornado
+                    // elytra randomly falls off entering cyclone
                     if (cyclone.getWindsMph() > 110 && chance(1 + ((cyclone.getWindsMph() - 110) / 8))) {
                         ItemStack chestplate = player.getInventory().getChestplate();
                         if (chestplate != null && chestplate.getType() == Material.ELYTRA) {
@@ -148,7 +149,7 @@ public class TropicalCycloneHandler {
                             player.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "The winds tore your elytra into pieces!");
                         }
                     }
-                    // random parts of inventory get blown away when entering tornado
+                    // random parts of inventory get blown away when entering cyclone
                     if (chance(15)) {
                         int invSize = player.getInventory().getSize();
                         boolean someBlownAway = false;
@@ -171,7 +172,6 @@ public class TropicalCycloneHandler {
                         }
                     }
                 } else if (dist < 90) { // if less than 90 blocks from cyclone, move around entities that are near the cyclone
-                    inBossBarZone = true;
                     for (Entity entity : player.getNearbyEntities(50, 50, 50)) {
                         Location entityLocation = entity.getLocation();
                         double entDist = entityLocation.distance(cycloneLoc);
@@ -186,8 +186,6 @@ public class TropicalCycloneHandler {
                             }
                         }
                     }
-                } else if (dist < 140) {
-                    inBossBarZone = true;
                 }
             }
             if (inBossBarZone) {
@@ -216,8 +214,34 @@ public class TropicalCycloneHandler {
         return isInEyeArea(cyclone, player, xyDistFromEye) && Math.abs(yDiff) < 10;
     }
 
+    public void giveProtectedArmor(Player player, TropicalCyclone cyclone) {
+        // randomly choose armor, put in inventory or drop at feet
+        int chooseArmor = RANDOM.nextInt(4);
+        Material armorType = Material.LEATHER_HELMET;
+        switch (chooseArmor) {
+            case 1:
+                armorType = Material.LEATHER_CHESTPLATE;
+                break;
+            case 2:
+                armorType = Material.LEATHER_LEGGINGS;
+                break;
+            case 3:
+                armorType = Material.LEATHER_BOOTS;
+                break;
+        }
+        ItemStack armor = new ItemStack(armorType, 1);
+        // add lore etc
+
+        if (!player.getInventory().addItem(armor).isEmpty()) {
+
+        }
+    }
+
     public boolean wearingProtectedArmor(Player player, double winds) {
-        for (ItemStack )
+        for (ItemStack armor : player.getInventory().getArmorContents()) {
+            if (getCycloneProtectionRating(armor) > winds) return true;
+        }
+        return false;
     }
 
     public double getCycloneProtectionRating(ItemStack item) {

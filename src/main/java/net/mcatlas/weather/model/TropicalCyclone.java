@@ -120,6 +120,10 @@ public class TropicalCyclone {
         this.playersWhoReceivedReward = players;
     }
 
+    public boolean hasReceivedReward(UUID player) {
+        return playersWhoReceivedReward.contains(player);
+    }
+
     public double getEyeRadius() {
         return 6 - (.7 * category.power);
     }

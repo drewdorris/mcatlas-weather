@@ -25,6 +25,7 @@ public class TropicalCycloneDataHandler {
         this.cycloneHandler = plugin.getTropicalCycloneHandler();
         if (!loadTropicalCycloneData()) {
             plugin.getLogger().warning("Issue loading tropical cyclone data!");
+            return;
         }
 
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
@@ -35,25 +36,21 @@ public class TropicalCycloneDataHandler {
 
     private boolean loadTropicalCycloneData() {
         File configFile = new File(plugin.getDataFolder(), DATA_FILE_NAME);
-        if (configFile.exists()) {
-            dataYaml = YamlConfiguration.loadConfiguration(configFile);
-        } else {
-            return false;
-        }
-        // this statement runs if the playerdata file has never been created
-        if (dataYaml == null) {
+        if (!configFile.exists()) {
             try {
                 configFile.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
+                plugin.getLogger().warning("Issue creating tropical cyclone data file!");
                 return false;
             }
-            dataYaml = YamlConfiguration.loadConfiguration(configFile);
         }
-        return dataYaml == null;
+        dataYaml = YamlConfiguration.loadConfiguration(configFile);
+        return dataYaml != null;
     }
 
     public void refreshPlayers(Collection<TropicalCyclone> cyclones) {
+        if (dataYaml.getConfigurationSection("cyclones") == null) return;
         for (String cycloneId : dataYaml.getConfigurationSection("cyclones").getKeys(false)) {
             String cycloneSection = "cyclones." + cycloneId;
             Set<String> players = dataYaml.getStringList(cycloneSection).stream().collect(Collectors.toSet());

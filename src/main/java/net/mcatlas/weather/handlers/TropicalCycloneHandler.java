@@ -75,7 +75,8 @@ public class TropicalCycloneHandler {
             cyclone.cancel();
         }
         plugin.getDynmapHandler().resetTropicalCycloneMarkers();
-        JsonElement data = plugin.getJsonHandler().getJsonFromURL("https://api.weatherusa.net/v1.2/tropical?storm=active");
+        //JsonElement data = plugin.getJsonHandler().getJsonFromURL("https://api.weatherusa.net/v1.2/tropical?storm=active");
+        JsonElement data = plugin.getJsonHandler().getJsonFromLocal("plugins/mcatlas-weather/tropicalstorms2.json");
         this.cyclones = plugin.getJsonHandler().extractTropicalCycloneData(data);
         plugin.getDynmapHandler().createTropicalCycloneMarkers(cyclones);
 
@@ -251,12 +252,14 @@ public class TropicalCycloneHandler {
 
     public boolean wearingProtectedArmor(Player player, double winds) {
         for (ItemStack armor : player.getInventory().getArmorContents()) {
+            if (armor == null) continue;
             if (getCycloneProtectionRating(armor) > winds) return true;
         }
         return false;
     }
 
     public double getCycloneProtectionRating(ItemStack item) {
+        if (item == null) return -1;
         switch (item.getType()) {
             case LEATHER_BOOTS:
             case LEATHER_CHESTPLATE:

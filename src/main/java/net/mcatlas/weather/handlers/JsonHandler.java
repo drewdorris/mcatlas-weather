@@ -26,6 +26,7 @@ public class JsonHandler {
         this.plugin = plugin;
     }
 
+    // example input "https://api.weatherusa.net/v1.2/tropical?storm=active"
     public JsonElement getJsonFromURL(String urlString) {
         URL url;
         HttpURLConnection connection = null;

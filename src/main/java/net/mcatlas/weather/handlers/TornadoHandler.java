@@ -37,7 +37,7 @@ public class TornadoHandler {
         this.minutesBetweenTornadoAlerts = minutesBetweenTornadoAlerts;
         this.tornadoes = new HashSet<>();
 
-        tornadoBossBar = Bukkit.createBossBar(ChatColor.WHITE + "" + ChatColor.BOLD + "Tornado Warning", BarColor.RED, BarStyle.SOLID, BarFlag.DARKEN_SKY);
+        tornadoBossBar = Bukkit.createBossBar(ChatColor.WHITE + "" + ChatColor.BOLD + "Tornado Warning", BarColor.RED, BarStyle.SOLID, BarFlag.DARKEN_SKY, BarFlag.CREATE_FOG);
 
         Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             tornadoBossBar.setTitle(ChatColor.WHITE + "" + ChatColor.BOLD + "Tornado Warning");

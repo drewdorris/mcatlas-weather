@@ -29,7 +29,7 @@ public class TropicalCycloneHandler {
 
     private Set<TropicalCyclone> cyclones;
     private Set<UUID> playersCurrentlyInCyclone;
-    private BossBar bossBar;
+    private Map<BossBar, String> bossBars;
 
     private TropicalCycloneDataHandler dataHandler;
 
@@ -39,15 +39,20 @@ public class TropicalCycloneHandler {
         this.plugin = plugin;
         this.cyclones = new HashSet<>();
         this.playersCurrentlyInCyclone = new HashSet<>();
-        this.bossBar = Bukkit.createBossBar(ChatColor.WHITE + "" + ChatColor.BOLD + "Tropical Cyclone Warning", BarColor.RED, BarStyle.SOLID, BarFlag.DARKEN_SKY, BarFlag.CREATE_FOG);
+        this.bossBars = new HashMap<>();
+        //this.bossBar = Bukkit.createBossBar(ChatColor.WHITE + "" + ChatColor.BOLD + "Tropical Cyclone Warning", BarColor.RED, BarStyle.SOLID, BarFlag.DARKEN_SKY);
 
         Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-            bossBar.setTitle(ChatColor.WHITE + "" + ChatColor.BOLD + "Tropical Cyclone Warning");
-        }, 0L, 40L);
+            for (Map.Entry<BossBar, String> entry : bossBars.entrySet()) {
+                entry.getKey().setTitle(ChatColor.WHITE + "" + ChatColor.BOLD + entry.getValue());
+            }
+        }, 0L, 80L);
 
         Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-            bossBar.setTitle(ChatColor.DARK_RED + "" + ChatColor.BOLD + "Tropical Cyclone Warning");
-        }, 20L, 40L);
+            for (Map.Entry<BossBar, String> entry : bossBars.entrySet()) {
+                entry.getKey().setTitle(ChatColor.DARK_RED + "" + ChatColor.BOLD + "Tropical Cyclone Warning");
+            }
+        }, 40L, 80L);
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             Bukkit.getScheduler().runTaskTimerAsynchronously(WeatherPlugin.get(), () -> {
@@ -80,8 +85,12 @@ public class TropicalCycloneHandler {
         this.cyclones = plugin.getJsonHandler().extractTropicalCycloneData(data);
         plugin.getDynmapHandler().createTropicalCycloneMarkers(cyclones);
 
+        this.bossBars.clear();
         for (TropicalCyclone cyclone : cyclones) {
             cyclone.spawn();
+            BossBar bar = Bukkit.createBossBar(ChatColor.WHITE + "" + ChatColor.BOLD + cyclone.getName(), BarColor.RED, BarStyle.SOLID, BarFlag.DARKEN_SKY);
+            String title = cyclone.getName();
+            this.bossBars.put(bar, title);
         }
         plugin.getLogger().info(cyclones.size() + " cyclones total");
         this.loaded = true;
@@ -90,7 +99,7 @@ public class TropicalCycloneHandler {
     public void launchEntitiesInCyclone() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.getWorld().getEnvironment() != World.Environment.NORMAL) {
-                removeFromBossBar(player);
+                removeFromBossBars(player);
                 continue;
             }
 
@@ -98,7 +107,7 @@ public class TropicalCycloneHandler {
             int y = location.getWorld().getHighestBlockYAt(location);
             int playerY = location.getBlockY();
 
-            boolean inBossBarZone = false;
+            TropicalCyclone bossBarCyclone = null;
 
             for (TropicalCyclone cyclone : cyclones) {
                 final Location cycloneLoc = cyclone.getLocation();
@@ -110,7 +119,7 @@ public class TropicalCycloneHandler {
                 if (dist < 0.1) dist = .1; // if its 0 or near 0 it will be an issue for the vector
 
                 if (dist < 150) {
-                    inBossBarZone = true;
+                    bossBarCyclone = cyclone;
                 }
 
                 if (isInCoreEye(cyclone, location, dist) && !cyclone.hasReceivedReward(player.getUniqueId())) {
@@ -191,10 +200,10 @@ public class TropicalCycloneHandler {
                     }
                 }
             }
-            if (inBossBarZone) {
-                addToBossBar(player);
+            if (bossBarCyclone != null) {
+                addToBossBar(player, bossBarCyclone);
             } else {
-                removeFromBossBar(player);
+                removeFromBossBars(player);
             }
         }
     }
@@ -248,6 +257,7 @@ public class TropicalCycloneHandler {
         }
 
         cyclone.addPlayerReceivedReward(player.getUniqueId());
+        dataHandler.addPlayer(cyclone.getId(), player.getUniqueId());
     }
 
     public boolean wearingProtectedArmor(Player player, double winds) {
@@ -289,12 +299,20 @@ public class TropicalCycloneHandler {
         return highestRating;
     }
 
-    public void addToBossBar(Player player) {
-        bossBar.addPlayer(player);
+    public void addToBossBar(Player player, TropicalCyclone cyclone) {
+        for (Map.Entry<BossBar, String> entry : bossBars.entrySet()) {
+            if (entry.getValue().equals(cyclone.getName())) {
+                entry.getKey().addPlayer(player);
+            } else {
+                entry.getKey().removePlayer(player);
+            }
+        }
     }
 
-    public void removeFromBossBar(Player player) {
-        bossBar.removePlayer(player);
+    public void removeFromBossBars(Player player) {
+        for (Map.Entry<BossBar, String> entry : bossBars.entrySet()) {
+            entry.getKey().removePlayer(player);
+        }
     }
 
 }

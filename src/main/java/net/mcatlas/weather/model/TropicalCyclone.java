@@ -124,6 +124,14 @@ public class TropicalCyclone {
         return 6 - (.7 * category.power);
     }
 
+    public double getWindsHeight() {
+        return 140 + (getCategory().power * 6);
+    }
+
+    public double getWindsWidth() {
+        return 35 + (getWindsMph() / 7);
+    }
+
     public void cancel() {
         this.cancelled = true;
     }

@@ -106,8 +106,11 @@ public class TropicalCycloneHandler {
                 double dist = location.distance(cycloneLoc);
                 if (dist < 0.1) dist = .1; // if its 0 or near 0 it will be an issue for the vector
                 // within 35 + (more depending on wind) blocks of eye, not within eye, less than y=200, not currently in cyclone
-                if (dist < 35 + (cyclone.getWindsMph() / 7) && dist > cyclone.getEyeRadius() && playerY < 140 + (cyclone.getCategory().power * 6) &&
-                        !playersCurrentlyInCyclone.contains(player.getUniqueId())) {
+                if (!playersCurrentlyInCyclone.contains(player.getUniqueId()) &&
+                        !isInEyeArea(cyclone, location, dist) &&
+                        playerY < cyclone.getWindsHeight() &&
+                        dist < cyclone.getWindsWidth() &&
+                        !wearingProtectedArmor(player, cyclone.getWindsMph())) {
                     inBossBarZone = true;
 
                     // send them flying
@@ -130,6 +133,9 @@ public class TropicalCycloneHandler {
                     Bukkit.getScheduler().runTaskLater(plugin,
                             () -> playersCurrentlyInCyclone.remove(player.getUniqueId()), iter);
 
+                    if (isInCoreEye(cyclone, location, dist)) {
+                        // give armor and stuff
+                    }
                     //if (!tornado.playerHasAlreadyReceivedNamedItem(player.getUniqueId())) {
                         //nameItemInHand(player, tornado);
                     //}
@@ -164,7 +170,7 @@ public class TropicalCycloneHandler {
                             }, 20L * 2);
                         }
                     }
-                } else if (dist < 50) { // if less than 30 blocks from tornado, move around entities that are near the tornado
+                } else if (dist < 90) { // if less than 90 blocks from cyclone, move around entities that are near the cyclone
                     inBossBarZone = true;
                     for (Entity entity : player.getNearbyEntities(50, 50, 50)) {
                         Location entityLocation = entity.getLocation();
@@ -180,7 +186,7 @@ public class TropicalCycloneHandler {
                             }
                         }
                     }
-                } else if (dist < 50) {
+                } else if (dist < 140) {
                     inBossBarZone = true;
                 }
             }
@@ -192,10 +198,40 @@ public class TropicalCycloneHandler {
         }
     }
 
-    public boolean isCycloneProtectionArmor(ItemStack item) {
-        if (item.getType() != Material.LEATHER_HELMET) return false;
+    // within the eye from top to bottom
+    // xyDistFromEye is distance ignoring y
+    public boolean isInEyeArea(TropicalCyclone cyclone, Location player, double xyDistFromEye) {
+        double yDiff = player.getY() - cyclone.getLocation().getY();
 
-        if (!item.getItemMeta().hasLore()) return false;
+        if (yDiff < -10 || yDiff > 150) return false;
+
+        if (xyDistFromEye > cyclone.getEyeRadius() + (.04 * yDiff)) return false;
+
+        return true;
+    }
+
+    // surface level area of the eye
+    public boolean isInCoreEye(TropicalCyclone cyclone, Location player, double xyDistFromEye) {
+        double yDiff = player.getY() - cyclone.getLocation().getY();
+        return isInEyeArea(cyclone, player, xyDistFromEye) && Math.abs(yDiff) < 10;
+    }
+
+    public boolean wearingProtectedArmor(Player player, double winds) {
+        for (ItemStack )
+    }
+
+    public double getCycloneProtectionRating(ItemStack item) {
+        switch (item.getType()) {
+            case LEATHER_BOOTS:
+            case LEATHER_CHESTPLATE:
+            case LEATHER_HELMET:
+            case LEATHER_LEGGINGS:
+                break;
+            default:
+                return -1;
+        }
+
+        if (!item.getItemMeta().hasLore()) return -1;
 
         List<Component> lore = item.getItemMeta().lore();
         for (Component lorePiece : lore) {
@@ -203,10 +239,14 @@ public class TropicalCycloneHandler {
 
             String loreString = lorePiece.toString();
             if (loreString.contains("Rated for ")) {
-                return true;
+                int indexStart = loreString.indexOf("Rated for ") + 10;
+                String mph = loreString.substring(indexStart + loreString.indexOf(" ", indexStart));
+                // untested
+                System.out.println(mph);
+                // parse double and return value
             }
         }
-        return false;
+        return -1;
     }
 
     public void addToBossBar(Player player) {

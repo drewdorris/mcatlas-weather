@@ -16,8 +16,12 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.inventory.meta.Repairable;
 import org.bukkit.util.Vector;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static net.mcatlas.weather.WeatherUtil.RANDOM;
@@ -57,6 +61,7 @@ public class TropicalCycloneHandler {
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             Bukkit.getScheduler().runTaskTimerAsynchronously(WeatherPlugin.get(), () -> {
                 updateTropicalCyclones();
+                dataHandler.refreshPlayers(cyclones);
             }, 0L, 20 * 60 * 30L); // 30 sec
 
             Bukkit.getScheduler().runTaskTimer(WeatherPlugin.get(), () -> {
@@ -80,11 +85,14 @@ public class TropicalCycloneHandler {
             cyclone.cancel();
         }
         plugin.getDynmapHandler().resetTropicalCycloneMarkers();
-        //JsonElement data = plugin.getJsonHandler().getJsonFromURL("https://api.weatherusa.net/v1.2/tropical?storm=active");
-        JsonElement data = plugin.getJsonHandler().getJsonFromLocal("plugins/mcatlas-weather/tropicalstorms2.json");
+        JsonElement data = plugin.getJsonHandler().getJsonFromURL("https://api.weatherusa.net/v1.2/tropical?storm=active");
+        //JsonElement data = plugin.getJsonHandler().getJsonFromLocal("plugins/mcatlas-weather/tropicalstorms2.json");
         this.cyclones = plugin.getJsonHandler().extractTropicalCycloneData(data);
         plugin.getDynmapHandler().createTropicalCycloneMarkers(cyclones);
 
+        for (BossBar bossBar : bossBars.keySet()) {
+            bossBar.removeAll();
+        }
         this.bossBars.clear();
         for (TropicalCyclone cyclone : cyclones) {
             cyclone.spawn();
@@ -102,6 +110,8 @@ public class TropicalCycloneHandler {
                 removeFromBossBars(player);
                 continue;
             }
+
+            if (player.getGameMode() == GameMode.SPECTATOR) continue;
 
             Location location = player.getLocation();
             int y = location.getWorld().getHighestBlockYAt(location);
@@ -144,6 +154,7 @@ public class TropicalCycloneHandler {
                     int iter;
                     for (iter = 1; iter < (7 * 3) + (RANDOM.nextInt(5) * 7); iter++) {
                         Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                            if (wearingProtectedArmor(player, cyclone.getWindsMph())) return;
                             Location currentPlayerLoc = player.getLocation();
                             currentPlayerLoc.setY(y);
                             double newDist = currentPlayerLoc.distance(cycloneLoc);
@@ -242,13 +253,19 @@ public class TropicalCycloneHandler {
                 break;
         }
         ItemStack armor = new ItemStack(armorType, 1);
-        ItemMeta meta = armor.getItemMeta();
-        meta.setDisplayName(ChatColor.RED + cyclone.getCategory().formatted + " " +
-                cyclone.getShortName() + " - " + ChatColor.GRAY +  "Withstands " + (int) cyclone.getWindsMph() + "mph");
-        meta.addEnchant(Enchantment.DAMAGE_ALL, 4, true);
+        LeatherArmorMeta meta = (LeatherArmorMeta) armor.getItemMeta();
+        meta.setDisplayName(ChatColor.RED + cyclone.getName() + " - " + ChatColor.GRAY +  "Withstands " + (int) cyclone.getWindsMph() + "mph");
+        meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 4, true);
         String stringRated = "Rated for " + (int) cyclone.getWindsMph() + "mph winds";
-        List<String> lore = Arrays.asList(stringRated);
+        String stringBy = "Created by " + player.getName() + " on " + LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
+        List<String> lore = Arrays.asList(stringRated, stringBy);
         meta.setLore(lore);
+        int speed = (int) cyclone.getWindsMph();
+        int redScale = Math.abs(225 - speed);
+        meta.setColor(Color.fromRGB(255, redScale, redScale));
+        if (meta instanceof Repairable) {
+            ((Repairable) meta).setRepairCost(400);
+        }
         armor.setItemMeta(meta);
         // add lore etc
 
@@ -263,7 +280,7 @@ public class TropicalCycloneHandler {
     public boolean wearingProtectedArmor(Player player, double winds) {
         for (ItemStack armor : player.getInventory().getArmorContents()) {
             if (armor == null) continue;
-            if (getCycloneProtectionRating(armor) > winds) return true;
+            if (getCycloneProtectionRating(armor) >= winds) return true;
         }
         return false;
     }
@@ -290,10 +307,9 @@ public class TropicalCycloneHandler {
             String loreString = lorePiece.toString();
             if (loreString.contains("Rated for ")) {
                 int indexStart = loreString.indexOf("Rated for ") + 10;
-                String mph = loreString.substring(indexStart + loreString.indexOf(" ", indexStart));
-                // untested
-                System.out.println("\"" + mph + "\"");
-                // parse double and return value
+                String mphStr = loreString.substring(indexStart, loreString.indexOf("mph", indexStart));
+                double mph = Double.valueOf(mphStr);
+                if (mph > highestRating) highestRating = (int) mph;
             }
         }
         return highestRating;

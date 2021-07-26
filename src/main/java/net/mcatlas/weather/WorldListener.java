@@ -10,6 +10,7 @@ import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.world.WorldInitEvent;
@@ -58,7 +59,7 @@ public class WorldListener implements Listener {
 				double dist = cycloneLoc.distance(location);
 				if (dist < 25) {
 					event.setCancelled(true);
-					event.getPlayer().sendMessage(ChatColor.RED + "Can't place near " + cyclone.getName());
+					event.getPlayer().sendMessage(ChatColor.RED + "You can't place blocks near " + cyclone.getName() + "!");
 					return;
 				}
 			}
@@ -69,9 +70,9 @@ public class WorldListener implements Listener {
 				Location tornadoLoc = tornado.getLocation();
 				tornadoLoc.setY(64);
 				double dist = tornado.getLocation().distance(location);
-				if (dist < 10) {
+				if (dist < 13) {
 					event.setCancelled(true);
-					event.getPlayer().sendMessage(ChatColor.RED + "Can't place near the " + tornado.getArea() + " tornado");
+					event.getPlayer().sendMessage(ChatColor.RED + "You can't place near the " + tornado.getArea() + " tornado");
 					return;
 				}
 			}
@@ -80,7 +81,7 @@ public class WorldListener implements Listener {
 
 	// When block is placed
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onBlockBreak(BlockPlaceEvent event) {
+	public void onBlockBreak(BlockBreakEvent event) {
 		Location location = event.getBlock().getLocation();
 		if (location.getWorld().getEnvironment() != World.Environment.NORMAL) {
 			return;
@@ -91,12 +92,24 @@ public class WorldListener implements Listener {
 				double dist = cyclone.getLocation().distance(location);
 				if (dist < 25) {
 					event.setCancelled(true);
-					event.getPlayer().sendMessage(ChatColor.RED + "Can't place near " + cyclone.getName());
+					event.getPlayer().sendMessage(ChatColor.RED + "You can't break near " + cyclone.getName() + "!");
 					return;
 				}
 			}
 		}
-		// have something for preventing placing near tornadoes
+		if (WeatherPlugin.get().getTornadoHandler() != null) {
+			location.setY(64);
+			for (Tornado tornado : WeatherPlugin.get().getTornadoHandler().getTornadoes()) {
+				Location tornadoLoc = tornado.getLocation();
+				tornadoLoc.setY(64);
+				double dist = tornado.getLocation().distance(location);
+				if (dist < 13) {
+					event.setCancelled(true);
+					event.getPlayer().sendMessage(ChatColor.RED + "You can't break near the " + tornado.getArea() + " tornado!");
+					return;
+				}
+			}
+		}
 	}
 
 }

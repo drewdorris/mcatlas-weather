@@ -15,6 +15,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.Repairable;
@@ -85,8 +86,8 @@ public class TropicalCycloneHandler {
             cyclone.cancel();
         }
         plugin.getDynmapHandler().resetTropicalCycloneMarkers();
-        JsonElement data = plugin.getJsonHandler().getJsonFromURL("https://api.weatherusa.net/v1.2/tropical?storm=active");
-        //JsonElement data = plugin.getJsonHandler().getJsonFromLocal("plugins/mcatlas-weather/tropicalstorms2.json");
+        //JsonElement data = plugin.getJsonHandler().getJsonFromURL("https://api.weatherusa.net/v1.2/tropical?storm=active");
+        JsonElement data = plugin.getJsonHandler().getJsonFromLocal("plugins/mcatlas-weather/tropicalstorms2.json");
         this.cyclones = plugin.getJsonHandler().extractTropicalCycloneData(data);
         plugin.getDynmapHandler().createTropicalCycloneMarkers(cyclones);
 
@@ -237,6 +238,7 @@ public class TropicalCycloneHandler {
         return isInEyeArea(cyclone, player, xyDistFromEye) && Math.abs(yDiff) < 10;
     }
 
+    // gives the reward to the player
     public void giveProtectedArmor(Player player, TropicalCyclone cyclone) {
         // randomly choose armor, put in inventory or drop at feet
         int chooseArmor = RANDOM.nextInt(4);
@@ -252,22 +254,25 @@ public class TropicalCycloneHandler {
                 armorType = Material.LEATHER_BOOTS;
                 break;
         }
+
         ItemStack armor = new ItemStack(armorType, 1);
         LeatherArmorMeta meta = (LeatherArmorMeta) armor.getItemMeta();
+
         meta.setDisplayName(ChatColor.RED + cyclone.getName() + " - " + ChatColor.GRAY +  "Withstands " + (int) cyclone.getWindsMph() + "mph");
         meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 4, true);
+
         String stringRated = "Rated for " + (int) cyclone.getWindsMph() + "mph winds";
         String stringBy = "Created by " + player.getName() + " on " + LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
         List<String> lore = Arrays.asList(stringRated, stringBy);
         meta.setLore(lore);
+
         int speed = (int) cyclone.getWindsMph();
         int redScale = Math.abs(225 - speed);
         meta.setColor(Color.fromRGB(255, redScale, redScale));
+
         if (meta instanceof Repairable) {
             ((Repairable) meta).setRepairCost(400);
         }
-        armor.setItemMeta(meta);
-        // add lore etc
 
         if (!player.getInventory().addItem(armor).isEmpty()) {
             player.getWorld().dropItem(player.getLocation(), armor);

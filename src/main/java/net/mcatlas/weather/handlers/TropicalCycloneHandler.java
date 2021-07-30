@@ -15,8 +15,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.Repairable;
 import org.bukkit.util.Vector;
@@ -25,8 +23,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import static net.mcatlas.weather.WeatherUtil.RANDOM;
-import static net.mcatlas.weather.WeatherUtil.chance;
+import static net.mcatlas.weather.WeatherUtil.*;
 
 public class TropicalCycloneHandler {
 
@@ -86,8 +83,8 @@ public class TropicalCycloneHandler {
             cyclone.cancel();
         }
         plugin.getDynmapHandler().resetTropicalCycloneMarkers();
-        //JsonElement data = plugin.getJsonHandler().getJsonFromURL("https://api.weatherusa.net/v1.2/tropical?storm=active");
-        JsonElement data = plugin.getJsonHandler().getJsonFromLocal("plugins/mcatlas-weather/tropicalstorms2.json");
+        JsonElement data = plugin.getJsonHandler().getJsonFromURL("https://api.weatherusa.net/v1.2/tropical?storm=active");
+        //JsonElement data = plugin.getJsonHandler().getJsonFromLocal("plugins/mcatlas-weather/tropicalstorms2.json");
         this.cyclones = plugin.getJsonHandler().extractTropicalCycloneData(data);
         plugin.getDynmapHandler().createTropicalCycloneMarkers(cyclones);
 
@@ -103,6 +100,14 @@ public class TropicalCycloneHandler {
         }
         plugin.getLogger().info(cyclones.size() + " cyclones total");
         this.loaded = true;
+
+        String locations = "";
+        for (TropicalCyclone cyclone : this.cyclones) {
+            locations += cyclone.getName() + "; ";
+        }
+        locations = locations.substring(0, locations.length() - 2);
+        Bukkit.broadcastMessage(ChatColor.DARK_RED + "" + ChatColor.BOLD +
+                "Tropical Cyclones currently in the world: " + ChatColor.RESET + "" + ChatColor.DARK_RED + locations);
     }
 
     public void launchEntitiesInCyclone() {
@@ -166,7 +171,7 @@ public class TropicalCycloneHandler {
                             () -> playersCurrentlyInCyclone.remove(player.getUniqueId()), iter);
 
                     // elytra randomly falls off entering cyclone
-                    if (cyclone.getWindsMph() > 110 && chance(1 + ((cyclone.getWindsMph() - 110) / 8))) {
+                    if (cyclone.getWindsMph() > 110 && chanceOutOf(1 + ((cyclone.getWindsMph() - 110) / 8), 1000)) {
                         ItemStack chestplate = player.getInventory().getChestplate();
                         if (chestplate != null && chestplate.getType() == Material.ELYTRA) {
                             player.getInventory().setChestplate(null);
@@ -174,7 +179,7 @@ public class TropicalCycloneHandler {
                         }
                     }
                     // random parts of inventory get blown away when entering cyclone
-                    if (chance(15)) {
+                    if (chance(3)) {
                         int invSize = player.getInventory().getSize();
                         boolean someBlownAway = false;
                         for (int i = 0; i < RANDOM.nextInt(5); i++) {
@@ -280,6 +285,11 @@ public class TropicalCycloneHandler {
 
         cyclone.addPlayerReceivedReward(player.getUniqueId());
         dataHandler.addPlayer(cyclone.getId(), player.getUniqueId());
+
+        player.sendMessage(ChatColor.GREEN + "You've won some cyclone protection for getting into the eye!");
+        if (cyclone.getPlayersWhoReceivedReward().size() == 1) {
+            Bukkit.broadcastMessage(ChatColor.GREEN + player.getName() + " was the first to get into the eye of " + cyclone.getName() + "!");
+        }
     }
 
     public boolean wearingProtectedArmor(Player player, double winds) {

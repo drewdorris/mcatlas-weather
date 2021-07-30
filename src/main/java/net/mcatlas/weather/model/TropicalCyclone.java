@@ -129,7 +129,7 @@ public class TropicalCyclone {
     }
 
     public double getWindsHeight() {
-        return 140 + (getCategory().power * 6);
+        return 95 + (getCategory().power * 7);
     }
 
     public double getWindsWidth() {

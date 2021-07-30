@@ -60,11 +60,11 @@ public class TropicalCycloneHandler {
             Bukkit.getScheduler().runTaskTimerAsynchronously(WeatherPlugin.get(), () -> {
                 updateTropicalCyclones();
                 dataHandler.refreshPlayers(cyclones);
-            }, 0L, 20 * 60 * 30L); // 30 sec
+            }, 0L, 20 * 60 * 30L); // 30 min
 
             Bukkit.getScheduler().runTaskTimer(WeatherPlugin.get(), () -> {
                 launchEntitiesInCyclone();
-            }, 0L, 21L); // every 21 ticks
+            }, 0L, 21L); // every 21 ticks to check
 
             dataHandler = new TropicalCycloneDataHandler(plugin);
         }, 20 * 20L);
@@ -88,16 +88,18 @@ public class TropicalCycloneHandler {
         this.cyclones = plugin.getJsonHandler().extractTropicalCycloneData(data);
         plugin.getDynmapHandler().createTropicalCycloneMarkers(cyclones);
 
+        // UPDATE BOSSBARS
         for (BossBar bossBar : bossBars.keySet()) {
             bossBar.removeAll();
         }
         this.bossBars.clear();
         for (TropicalCyclone cyclone : cyclones) {
             cyclone.spawn();
-            BossBar bar = Bukkit.createBossBar(ChatColor.WHITE + "" + ChatColor.BOLD + cyclone.getName(), BarColor.RED, BarStyle.SOLID, BarFlag.DARKEN_SKY);
+            BossBar bar = Bukkit.createBossBar(ChatColor.WHITE + "" + ChatColor.BOLD + cyclone.getName(), BarColor.RED, BarStyle.SOLID, BarFlag.DARKEN_SKY, BarFlag.CREATE_FOG);
             String title = cyclone.getName();
             this.bossBars.put(bar, title);
         }
+
         plugin.getLogger().info(cyclones.size() + " cyclones total");
         this.loaded = true;
 
@@ -107,7 +109,7 @@ public class TropicalCycloneHandler {
         }
         locations = locations.substring(0, locations.length() - 2);
         Bukkit.broadcastMessage(ChatColor.DARK_RED + "" + ChatColor.BOLD +
-                "Tropical Cyclones currently in the world: " + ChatColor.RESET + "" + ChatColor.DARK_RED + locations);
+                "Tropical Cyclones in the world: " + ChatColor.RESET + "" + ChatColor.DARK_RED + locations);
     }
 
     public void launchEntitiesInCyclone() {
@@ -138,19 +140,19 @@ public class TropicalCycloneHandler {
                     bossBarCyclone = cyclone;
                 }
 
-                if (isInCoreEye(cyclone, location, dist) && !cyclone.hasReceivedReward(player.getUniqueId())) {
+                if (isInCoreEye(cyclone, player.getLocation(), dist) && !cyclone.hasReceivedReward(player.getUniqueId())) {
                     giveProtectedArmor(player, cyclone);
                     break;
                 }
 
                 // within 35 + (more depending on wind) blocks of eye, not within eye, less than y=200, not currently in cyclone
                 if (!playersCurrentlyInCyclone.contains(player.getUniqueId()) &&
-                        !isInEyeArea(cyclone, location, dist) &&
+                        !isInEyeArea(cyclone, player.getLocation(), dist) &&
                         playerY < cyclone.getWindsHeight() &&
                         dist < cyclone.getWindsWidth() &&
                         !wearingProtectedArmor(player, cyclone.getWindsMph())) {
                     // send them flying
-                    org.bukkit.util.Vector dir = cycloneLoc.toVector().subtract(location.toVector()).normalize();//.multiply(30 / dist);
+                    org.bukkit.util.Vector dir = cycloneLoc.toVector().subtract(player.getLocation().toVector()).normalize();//.multiply(30 / dist);
                     dir = dir.getCrossProduct(new Vector(0, 1, 0));
                     org.bukkit.util.Vector vector = new org.bukkit.util.Vector(dir.getX(), 10 / dist, dir.getZ());
                     
@@ -230,7 +232,7 @@ public class TropicalCycloneHandler {
     public boolean isInEyeArea(TropicalCyclone cyclone, Location player, double xyDistFromEye) {
         double yDiff = player.getY() - cyclone.getLocation().getY();
 
-        if (yDiff < -10 || yDiff > 150) return false;
+        if (yDiff < -10 || player.getY() > cyclone.getWindsHeight()) return false;
 
         if (xyDistFromEye > cyclone.getEyeRadius() + (.04 * yDiff)) return false;
 

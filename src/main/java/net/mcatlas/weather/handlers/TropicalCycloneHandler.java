@@ -74,6 +74,10 @@ public class TropicalCycloneHandler {
         return loaded;
     }
 
+    public Set<UUID> getPlayersCurrentlyInCyclone() {
+        return playersCurrentlyInCyclone;
+    }
+
     public Set<TropicalCyclone> getCyclones() {
         return this.cyclones;
     }
@@ -140,14 +144,14 @@ public class TropicalCycloneHandler {
                     bossBarCyclone = cyclone;
                 }
 
-                if (isInCoreEye(cyclone, player.getLocation(), dist) && !cyclone.hasReceivedReward(player.getUniqueId())) {
+                if (isInCoreEye(cyclone, player) && !cyclone.hasReceivedReward(player.getUniqueId())) {
                     giveProtectedArmor(player, cyclone);
                     break;
                 }
 
                 // within 35 + (more depending on wind) blocks of eye, not within eye, less than y=200, not currently in cyclone
                 if (!playersCurrentlyInCyclone.contains(player.getUniqueId()) &&
-                        !isInEyeArea(cyclone, player.getLocation(), dist) &&
+                        !isInEyeArea(cyclone, player) &&
                         playerY < cyclone.getWindsHeight() &&
                         dist < cyclone.getWindsWidth() &&
                         !wearingProtectedArmor(player, cyclone.getWindsMph())) {
@@ -170,7 +174,7 @@ public class TropicalCycloneHandler {
                         }, iter * 3L);
                     }
                     Bukkit.getScheduler().runTaskLater(plugin,
-                            () -> playersCurrentlyInCyclone.remove(player.getUniqueId()), iter);
+                            () -> playersCurrentlyInCyclone.remove(player.getUniqueId()), iter * 3);
 
                     // elytra randomly falls off entering cyclone
                     if (cyclone.getWindsMph() > 110 && chanceOutOf(1 + ((cyclone.getWindsMph() - 110) / 8), 1000)) {
@@ -227,22 +231,56 @@ public class TropicalCycloneHandler {
         }
     }
 
+    public TropicalCyclone getCyclonePlayerIsIn(Player player) {
+        for (TropicalCyclone cyclone : cyclones) {
+            if (isInCycloneWinds(cyclone, player)) {
+                return cyclone;
+            }
+        }
+        return null;
+    }
+
+    public boolean isInCycloneWindsUnprotected(Player player) {
+        TropicalCyclone cyclone = getCyclonePlayerIsIn(player);
+        if (cyclone == null) return false;
+        return !wearingProtectedArmor(player, cyclone.getWindsMph());
+    }
+
+    public boolean isInCycloneWinds(Player player) {
+        for (TropicalCyclone cyclone : cyclones) {
+            if (isInCycloneWinds(cyclone, player)) return true;
+        }
+        return false;
+    }
+
+    public boolean isInCycloneWinds(TropicalCyclone cyclone, Player player) {
+        Location editLocation = player.getLocation();
+        editLocation.setY(cyclone.getLocation().getY());
+        double xyDistFromEye = editLocation.distance(cyclone.getLocation());
+        return !isInEyeArea(cyclone, player) &&
+                player.getLocation().getY() < cyclone.getWindsHeight() &&
+                xyDistFromEye < cyclone.getWindsWidth();
+    }
+
     // within the eye from top to bottom
     // xyDistFromEye is distance ignoring y
-    public boolean isInEyeArea(TropicalCyclone cyclone, Location player, double xyDistFromEye) {
-        double yDiff = player.getY() - cyclone.getLocation().getY();
+    public boolean isInEyeArea(TropicalCyclone cyclone, Player player) {
+        double yDiff = player.getLocation().getY() - cyclone.getLocation().getY();
 
-        if (yDiff < -10 || player.getY() > cyclone.getWindsHeight()) return false;
+        if (yDiff < -10 || player.getLocation().getY() > cyclone.getWindsHeight()) return false;
 
+        Location editLocation = player.getLocation();
+        editLocation.setY(cyclone.getLocation().getY());
+        double xyDistFromEye = editLocation.distance(cyclone.getLocation());
         if (xyDistFromEye > cyclone.getEyeRadius() + (.04 * yDiff)) return false;
 
         return true;
     }
 
     // surface level area of the eye
-    public boolean isInCoreEye(TropicalCyclone cyclone, Location player, double xyDistFromEye) {
-        double yDiff = player.getY() - cyclone.getLocation().getY();
-        return isInEyeArea(cyclone, player, xyDistFromEye) && Math.abs(yDiff) < 10;
+    public boolean isInCoreEye(TropicalCyclone cyclone, Player player) {
+        double yDiff = player.getLocation().getY() - cyclone.getLocation().getY();
+        return isInEyeArea(cyclone, player) && Math.abs(yDiff) < 10;
     }
 
     // gives the reward to the player

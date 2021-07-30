@@ -1,17 +1,18 @@
 package net.mcatlas.weather;
 
+import net.mcatlas.weather.handlers.TropicalCycloneHandler;
 import net.mcatlas.weather.handlers.WeatherStatusHandler;
 import net.mcatlas.weather.model.Tornado;
 import net.mcatlas.weather.model.TropicalCyclone;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.world.WorldInitEvent;
 
@@ -107,6 +108,23 @@ public class WorldListener implements Listener {
 					event.setCancelled(true);
 					event.getPlayer().sendMessage(ChatColor.RED + "You can't break near the " + tornado.getArea() + " tornado!");
 					return;
+				}
+			}
+		}
+	}
+
+	// handle firework rockets in tropical cyclones
+	@EventHandler
+	public void onPlayerInteract(PlayerInteractEvent event) {
+		if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+			if (event.getItem() != null && event.getItem().getType() == Material.FIREWORK_ROCKET) {
+				TropicalCycloneHandler cycloneHandler = WeatherPlugin.get().getTropicalCycloneHandler();
+				if (cycloneHandler == null) return;
+
+				Player player = event.getPlayer();
+				if (cycloneHandler.isInCycloneWindsUnprotected(player)) {
+					event.setCancelled(true);
+					player.sendMessage(ChatColor.RED + "Can't use rockets near a tropical cyclone!");
 				}
 			}
 		}

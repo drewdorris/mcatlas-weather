@@ -15,6 +15,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.Repairable;
 import org.bukkit.util.Vector;
@@ -315,9 +316,9 @@ public class TropicalCycloneHandler {
         int redScale = Math.abs(225 - speed);
         meta.setColor(Color.fromRGB(255, redScale, redScale));
 
-        if (meta instanceof Repairable) {
-            ((Repairable) meta).setRepairCost(400);
-        }
+        ((Repairable) meta).setRepairCost(400);
+        ((Damageable) meta).setDamage((int) (armor.getType().getMaxDurability() * RANDOM.nextDouble()));
+        armor.setItemMeta(meta);
 
         if (!player.getInventory().addItem(armor).isEmpty()) {
             player.getWorld().dropItem(player.getLocation(), armor);

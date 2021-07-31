@@ -330,6 +330,8 @@ public class TropicalCycloneHandler {
         player.sendMessage(ChatColor.GREEN + "You've won some cyclone protection for getting into the eye!");
         if (cyclone.getPlayersWhoReceivedReward().size() == 1) {
             Bukkit.broadcastMessage(ChatColor.GREEN + player.getName() + " was the first to get into the eye of " + cyclone.getName() + "!");
+        } else {
+            Bukkit.broadcastMessage(ChatColor.GREEN + player.getName() + " got into the eye of " + cyclone.getName() + "!");
         }
     }
 

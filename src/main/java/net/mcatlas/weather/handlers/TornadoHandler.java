@@ -85,6 +85,10 @@ public class TornadoHandler {
             for (Tornado tornado : tornadoes) {
                 Location tornadoLoc = tornado.getLocation();
 
+                if (tornadoLoc.getWorld() != location.getWorld()) {
+                    continue;
+                }
+
                 tornadoLoc.setY(y);
                 location.setY(y);
 

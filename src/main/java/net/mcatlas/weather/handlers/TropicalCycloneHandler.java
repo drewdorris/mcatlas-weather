@@ -135,6 +135,10 @@ public class TropicalCycloneHandler {
             for (TropicalCyclone cyclone : cyclones) {
                 final Location cycloneLoc = cyclone.getLocation();
 
+                if (cycloneLoc.getWorld() != location.getWorld()) {
+                    continue;
+                }
+
                 cycloneLoc.setY(y);
                 location.setY(y);
 
@@ -257,6 +261,9 @@ public class TropicalCycloneHandler {
     public boolean isInCycloneWinds(TropicalCyclone cyclone, Player player) {
         Location editLocation = player.getLocation();
         editLocation.setY(cyclone.getLocation().getY());
+        if (editLocation.getWorld() != cyclone.getLocation().getWorld()) {
+            return false;
+        }
         double xyDistFromEye = editLocation.distance(cyclone.getLocation());
         return !isInEyeArea(cyclone, player) &&
                 player.getLocation().getY() < cyclone.getWindsHeight() &&
@@ -272,6 +279,9 @@ public class TropicalCycloneHandler {
 
         Location editLocation = player.getLocation();
         editLocation.setY(cyclone.getLocation().getY());
+        if (editLocation.getWorld() != cyclone.getLocation().getWorld()) {
+            return false;
+        }
         double xyDistFromEye = editLocation.distance(cyclone.getLocation());
         if (xyDistFromEye > cyclone.getEyeRadius() + (.04 * yDiff)) return false;
 

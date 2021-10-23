@@ -149,7 +149,7 @@ public class TropicalCyclone {
                 }
 
                 Bukkit.getScheduler().runTask(WeatherPlugin.get(), () -> { // just to be safe
-                    location.setY(getHighestSolidBlockYAt(location) + 1.5);
+                    location.setY(66);
                 });
 
                 Collection<Player> nearbyPlayers = Bukkit.getWorlds().get(0).getNearbyPlayers(location, 175 - (3 * category.power));
